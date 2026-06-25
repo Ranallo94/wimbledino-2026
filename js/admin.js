@@ -1,4 +1,4 @@
-/** ERBETTA — admin.js (stub temporaneo) */
+/** WIMBLEDINO — admin.js (stub temporaneo) */
 function _placeholder(id, titolo) {
   const el = document.getElementById(id);
   if (el) el.innerHTML =
