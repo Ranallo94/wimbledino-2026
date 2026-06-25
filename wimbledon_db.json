@@ -1,0 +1,1025 @@
+{
+  "evento": "Wimbledon 2026",
+  "tabellone": "Singolare maschile",
+  "bestOf": 5,
+  "setWin": 3,
+  "setOptions": [
+    "3-0",
+    "3-1",
+    "3-2"
+  ],
+  "turni": [
+    {
+      "id": "R128",
+      "nome": "1º turno",
+      "matches": 64
+    },
+    {
+      "id": "R64",
+      "nome": "2º turno",
+      "matches": 32
+    },
+    {
+      "id": "R32",
+      "nome": "3º turno",
+      "matches": 16
+    },
+    {
+      "id": "R16",
+      "nome": "Ottavi",
+      "matches": 8
+    },
+    {
+      "id": "QF",
+      "nome": "Quarti",
+      "matches": 4
+    },
+    {
+      "id": "SF",
+      "nome": "Semifinali",
+      "matches": 2
+    },
+    {
+      "id": "F",
+      "nome": "Finale",
+      "matches": 1
+    }
+  ],
+  "giocatori": {
+    "p001": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p002": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p003": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p004": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p005": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p006": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p007": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p008": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p009": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p010": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p011": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p012": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p013": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p014": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p015": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p016": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p017": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p018": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p019": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p020": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p021": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p022": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p023": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p024": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p025": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p026": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p027": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p028": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p029": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p030": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p031": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p032": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p033": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p034": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p035": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p036": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p037": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p038": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p039": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p040": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p041": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p042": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p043": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p044": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p045": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p046": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p047": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p048": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p049": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p050": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p051": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p052": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p053": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p054": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p055": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p056": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p057": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p058": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p059": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p060": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p061": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p062": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p063": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p064": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p065": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p066": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p067": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p068": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p069": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p070": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p071": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p072": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p073": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p074": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p075": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p076": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p077": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p078": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p079": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p080": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p081": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p082": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p083": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p084": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p085": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p086": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p087": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p088": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p089": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p090": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p091": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p092": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p093": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p094": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p095": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p096": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p097": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p098": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p099": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p100": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p101": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p102": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p103": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p104": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p105": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p106": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p107": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p108": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p109": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p110": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p111": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p112": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p113": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p114": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p115": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p116": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p117": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p118": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p119": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p120": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p121": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p122": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p123": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p124": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p125": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p126": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p127": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    },
+    "p128": {
+      "nome": "",
+      "seed": null,
+      "naz": ""
+    }
+  },
+  "draw_R128": [
+    {
+      "id": "R128_01",
+      "slotA": "p001",
+      "slotB": "p002"
+    },
+    {
+      "id": "R128_02",
+      "slotA": "p003",
+      "slotB": "p004"
+    },
+    {
+      "id": "R128_03",
+      "slotA": "p005",
+      "slotB": "p006"
+    },
+    {
+      "id": "R128_04",
+      "slotA": "p007",
+      "slotB": "p008"
+    },
+    {
+      "id": "R128_05",
+      "slotA": "p009",
+      "slotB": "p010"
+    },
+    {
+      "id": "R128_06",
+      "slotA": "p011",
+      "slotB": "p012"
+    },
+    {
+      "id": "R128_07",
+      "slotA": "p013",
+      "slotB": "p014"
+    },
+    {
+      "id": "R128_08",
+      "slotA": "p015",
+      "slotB": "p016"
+    },
+    {
+      "id": "R128_09",
+      "slotA": "p017",
+      "slotB": "p018"
+    },
+    {
+      "id": "R128_10",
+      "slotA": "p019",
+      "slotB": "p020"
+    },
+    {
+      "id": "R128_11",
+      "slotA": "p021",
+      "slotB": "p022"
+    },
+    {
+      "id": "R128_12",
+      "slotA": "p023",
+      "slotB": "p024"
+    },
+    {
+      "id": "R128_13",
+      "slotA": "p025",
+      "slotB": "p026"
+    },
+    {
+      "id": "R128_14",
+      "slotA": "p027",
+      "slotB": "p028"
+    },
+    {
+      "id": "R128_15",
+      "slotA": "p029",
+      "slotB": "p030"
+    },
+    {
+      "id": "R128_16",
+      "slotA": "p031",
+      "slotB": "p032"
+    },
+    {
+      "id": "R128_17",
+      "slotA": "p033",
+      "slotB": "p034"
+    },
+    {
+      "id": "R128_18",
+      "slotA": "p035",
+      "slotB": "p036"
+    },
+    {
+      "id": "R128_19",
+      "slotA": "p037",
+      "slotB": "p038"
+    },
+    {
+      "id": "R128_20",
+      "slotA": "p039",
+      "slotB": "p040"
+    },
+    {
+      "id": "R128_21",
+      "slotA": "p041",
+      "slotB": "p042"
+    },
+    {
+      "id": "R128_22",
+      "slotA": "p043",
+      "slotB": "p044"
+    },
+    {
+      "id": "R128_23",
+      "slotA": "p045",
+      "slotB": "p046"
+    },
+    {
+      "id": "R128_24",
+      "slotA": "p047",
+      "slotB": "p048"
+    },
+    {
+      "id": "R128_25",
+      "slotA": "p049",
+      "slotB": "p050"
+    },
+    {
+      "id": "R128_26",
+      "slotA": "p051",
+      "slotB": "p052"
+    },
+    {
+      "id": "R128_27",
+      "slotA": "p053",
+      "slotB": "p054"
+    },
+    {
+      "id": "R128_28",
+      "slotA": "p055",
+      "slotB": "p056"
+    },
+    {
+      "id": "R128_29",
+      "slotA": "p057",
+      "slotB": "p058"
+    },
+    {
+      "id": "R128_30",
+      "slotA": "p059",
+      "slotB": "p060"
+    },
+    {
+      "id": "R128_31",
+      "slotA": "p061",
+      "slotB": "p062"
+    },
+    {
+      "id": "R128_32",
+      "slotA": "p063",
+      "slotB": "p064"
+    },
+    {
+      "id": "R128_33",
+      "slotA": "p065",
+      "slotB": "p066"
+    },
+    {
+      "id": "R128_34",
+      "slotA": "p067",
+      "slotB": "p068"
+    },
+    {
+      "id": "R128_35",
+      "slotA": "p069",
+      "slotB": "p070"
+    },
+    {
+      "id": "R128_36",
+      "slotA": "p071",
+      "slotB": "p072"
+    },
+    {
+      "id": "R128_37",
+      "slotA": "p073",
+      "slotB": "p074"
+    },
+    {
+      "id": "R128_38",
+      "slotA": "p075",
+      "slotB": "p076"
+    },
+    {
+      "id": "R128_39",
+      "slotA": "p077",
+      "slotB": "p078"
+    },
+    {
+      "id": "R128_40",
+      "slotA": "p079",
+      "slotB": "p080"
+    },
+    {
+      "id": "R128_41",
+      "slotA": "p081",
+      "slotB": "p082"
+    },
+    {
+      "id": "R128_42",
+      "slotA": "p083",
+      "slotB": "p084"
+    },
+    {
+      "id": "R128_43",
+      "slotA": "p085",
+      "slotB": "p086"
+    },
+    {
+      "id": "R128_44",
+      "slotA": "p087",
+      "slotB": "p088"
+    },
+    {
+      "id": "R128_45",
+      "slotA": "p089",
+      "slotB": "p090"
+    },
+    {
+      "id": "R128_46",
+      "slotA": "p091",
+      "slotB": "p092"
+    },
+    {
+      "id": "R128_47",
+      "slotA": "p093",
+      "slotB": "p094"
+    },
+    {
+      "id": "R128_48",
+      "slotA": "p095",
+      "slotB": "p096"
+    },
+    {
+      "id": "R128_49",
+      "slotA": "p097",
+      "slotB": "p098"
+    },
+    {
+      "id": "R128_50",
+      "slotA": "p099",
+      "slotB": "p100"
+    },
+    {
+      "id": "R128_51",
+      "slotA": "p101",
+      "slotB": "p102"
+    },
+    {
+      "id": "R128_52",
+      "slotA": "p103",
+      "slotB": "p104"
+    },
+    {
+      "id": "R128_53",
+      "slotA": "p105",
+      "slotB": "p106"
+    },
+    {
+      "id": "R128_54",
+      "slotA": "p107",
+      "slotB": "p108"
+    },
+    {
+      "id": "R128_55",
+      "slotA": "p109",
+      "slotB": "p110"
+    },
+    {
+      "id": "R128_56",
+      "slotA": "p111",
+      "slotB": "p112"
+    },
+    {
+      "id": "R128_57",
+      "slotA": "p113",
+      "slotB": "p114"
+    },
+    {
+      "id": "R128_58",
+      "slotA": "p115",
+      "slotB": "p116"
+    },
+    {
+      "id": "R128_59",
+      "slotA": "p117",
+      "slotB": "p118"
+    },
+    {
+      "id": "R128_60",
+      "slotA": "p119",
+      "slotB": "p120"
+    },
+    {
+      "id": "R128_61",
+      "slotA": "p121",
+      "slotB": "p122"
+    },
+    {
+      "id": "R128_62",
+      "slotA": "p123",
+      "slotB": "p124"
+    },
+    {
+      "id": "R128_63",
+      "slotA": "p125",
+      "slotB": "p126"
+    },
+    {
+      "id": "R128_64",
+      "slotA": "p127",
+      "slotB": "p128"
+    }
+  ],
+  "bonus": [
+    {
+      "id": "most_aces",
+      "label": "Tennista con più ace",
+      "tipo": "giocatore"
+    },
+    {
+      "id": "most_breaks",
+      "label": "Tennista con più break ottenuti",
+      "tipo": "giocatore"
+    }
+  ],
+  "_note": "Placeholder p001..p128 e accoppiamenti draw_R128 da sostituire con il sorteggio ufficiale. setOptions = risultati esatti per numero di set (best-of-5)."
+}

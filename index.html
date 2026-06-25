@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏆 Mondialito 2026</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SCHERMATA LOGIN / REGISTRAZIONE
+  ══════════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="login-logo">
+          <img src="img/logo.png" alt="Mondialito 2026" class="login-logo-img">
+        </div>
+        <h1 class="login-title">Mondialito 2026</h1>
+        <p class="login-subtitle">USA · Canada · Messico</p>
+
+        <!-- Tab switcher -->
+        <div class="login-tabs">
+          <button class="login-tab active" id="tab-accedi" type="button">Accedi</button>
+          <button class="login-tab" id="tab-registrati" type="button">Registrati</button>
+        </div>
+
+        <!-- FORM LOGIN -->
+        <form id="form-login" class="login-form">
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <input id="login-email" type="email" class="field-input" placeholder="latua@email.com" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Password</label>
+            <input id="login-password" type="password" class="field-input" placeholder="Inserisci la tua password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Entra in Wimbledino</button>
+          <p id="login-error" class="login-error" style="display:none"></p>
+        </form>
+
+        <!-- FORM REGISTRAZIONE -->
+        <form id="form-registrazione" class="login-form" style="display:none">
+          <div class="field-group">
+            <label class="field-label">Nome</label>
+            <input id="reg-nome" type="text" class="field-input" placeholder="Mario" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cognome</label>
+            <input id="reg-cognome" type="text" class="field-input" placeholder="Rossi" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <input id="reg-email" type="email" class="field-input" placeholder="latua@email.com" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Numero di telefono</label>
+            <input id="reg-telefono" type="tel" class="field-input" placeholder="+39 333 123 4567" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nickname <span class="field-hint">— visibile nella classifica</span></label>
+            <input id="reg-nickname" type="text" class="field-input" placeholder="es. Roby, Il Fenomeno, MrGol..." required maxlength="20">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Scegli una password</label>
+            <input id="reg-password" type="password" class="field-input" placeholder="Minimo 6 caratteri" required minlength="6">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Conferma password</label>
+            <input id="reg-password2" type="password" class="field-input" placeholder="Ripeti la password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Invia richiesta di accesso</button>
+          <p id="reg-error" class="login-error" style="display:none"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCHERMATA ACCOUNT DISABILITATO
+  ══════════════════════════════════════════ -->
+  <div id="screen-disabilitato" class="screen" style="display:none">
+    <div class="login-bg">
+      <div class="login-card login-card--attesa">
+        <div class="login-logo">🚫</div>
+        <h2 class="login-title">Account disabilitato</h2>
+        <p class="attesa-desc">
+          Il tuo account è stato disabilitato dall'amministratore.<br>
+          Contatta l'organizzatore per maggiori informazioni.
+        </p>
+        <div class="attesa-info">
+          <div class="attesa-row"><span class="attesa-label">Account</span><span id="disab-nome" class="attesa-val"></span></div>
+          <div class="attesa-row"><span class="attesa-label">Stato</span><span class="attesa-val" style="color:var(--rosso)">Disabilitato</span></div>
+        </div>
+        <button id="btn-logout-disab" class="btn btn-secondary btn-full" style="margin-top:20px">Esci</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCHERMATA ATTESA APPROVAZIONE
+  ══════════════════════════════════════════ -->
+  <div id="screen-attesa" class="screen" style="display:none">
+    <div class="login-bg">
+      <div class="login-card login-card--attesa">
+        <div class="login-logo">⏳</div>
+        <h1 class="login-title" style="font-size:22px">Richiesta inviata!</h1>
+        <p class="login-subtitle" style="margin-bottom:20px">
+          La tua richiesta di accesso è in fase di revisione da parte degli organizzatori.
+          Riceverai conferma non appena il tuo account sarà approvato.
+        </p>
+        <div class="attesa-info">
+          <div class="attesa-row"><span class="attesa-label">Nome</span><span id="attesa-nome" class="attesa-val"></span></div>
+          <div class="attesa-row"><span class="attesa-label">Telefono</span><span id="attesa-telefono" class="attesa-val"></span></div>
+          <div class="attesa-row"><span class="attesa-label">Stato</span><span class="attesa-val attesa-pending">In attesa di approvazione</span></div>
+        </div>
+        <button id="btn-logout-attesa" class="btn btn-secondary btn-full" style="margin-top:20px">Esci</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       APP PRINCIPALE (post-login)
+  ══════════════════════════════════════════ -->
+  <div id="screen-app" class="screen" style="display:none">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-logo">
+          <img src="img/logo.png" alt="Mondialito" class="header-logo-img">
+          <span class="header-title">Mondialito <span class="header-year">2026</span></span>
+        </div>
+        <div class="header-user">
+          <span id="header-username" class="header-username"></span>
+          <button id="btn-logout" class="btn-icon" title="Esci">⇥</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- NAVIGAZIONE BOTTOM (mobile) / SIDEBAR (desktop) -->
+    <nav class="app-nav" id="app-nav">
+      <button class="nav-item active" data-page="classifica">
+        <span class="nav-icon">🏅</span>
+        <span class="nav-label">Classifica</span>
+      </button>
+      <button class="nav-item" data-page="live">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Risultati</span>
+        <span class="nav-badge" id="nav-live-badge" style="display:none">LIVE</span>
+      </button>
+      <button class="nav-item" data-page="pronostici">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Pronostici</span>
+      </button>
+      <button class="nav-item" data-page="profilo">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Il mio profilo</span>
+      </button>
+      <button class="nav-item" data-page="regolamento">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">Regolamento</span>
+      </button>
+      <button class="nav-item nav-admin" data-page="admin" id="nav-admin" style="display:none">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Admin</span>
+      </button>
+    </nav>
+
+    <!-- CONTENUTO PAGINE -->
+    <main class="app-main" id="app-main">
+
+      <!-- ── PAGINA: CLASSIFICA ── -->
+      <div id="page-classifica" class="page active">
+        <div class="page-header">
+          <h2 class="page-title">🏅 Classifica</h2>
+          <span id="classifica-updated" class="page-subtitle"></span>
+        </div>
+
+        <div class="classifica-search-wrap">
+          <input id="classifica-search" type="text" class="classifica-search-input" placeholder="🔍 Cerca partecipante…" autocomplete="off">
+        </div>
+
+        <div id="classifica-container">
+          <!-- Generato da classifica.js -->
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Caricamento classifica…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGINA: RISULTATI ── -->
+      <div id="page-live" class="page">
+        <div class="page-header">
+          <h2 class="page-title">📊 Risultati</h2>
+          <span id="live-updated" class="page-subtitle"></span>
+        </div>
+
+        <!-- Tab interni -->
+        <div class="inner-tabs" id="live-inner-tabs">
+          <button class="tab active" data-tab="tab-live-risultati">Partite</button>
+          <button class="tab" data-tab="tab-live-marcatori">⚽ Marcatori</button>
+        </div>
+
+        <!-- TAB: Partite -->
+        <div id="tab-live-risultati" class="tab-content active">
+          <!-- Partite in corso (solo se ci sono) -->
+          <div id="live-in-corso" class="section-block" style="display:none">
+            <h3 class="section-title section-title-live">🔴 In corso</h3>
+            <div id="live-partite-incorso"></div>
+          </div>
+
+          <!-- Partite oggi non ancora iniziate -->
+          <div id="live-oggi" class="section-block" style="display:none">
+            <h3 class="section-title">⏰ Oggi</h3>
+            <div id="live-partite-oggi"></div>
+          </div>
+
+          <!-- Risultati per girone -->
+          <div id="live-gironi" class="section-block">
+            <h3 class="section-title">📋 Risultati per girone</h3>
+            <div id="live-gironi-container">
+              <div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>
+            </div>
+          </div>
+
+          <!-- Prossime partite -->
+          <div id="live-prossime" class="section-block" style="display:none">
+            <h3 class="section-title">📅 Prossime partite</h3>
+            <div id="live-partite-prossime"></div>
+          </div>
+        </div>
+
+        <!-- TAB: Marcatori -->
+        <div id="tab-live-marcatori" class="tab-content">
+          <div id="live-marcatori-container">
+            <div class="loading-state"><div class="spinner"></div><p>Caricamento marcatori…</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGINA: PRONOSTICI ── -->
+      <div id="page-pronostici" class="page">
+        <div class="page-header">
+          <h2 class="page-title">📋 La mia scheda pronostici</h2>
+          <span id="pronostici-status" class="page-subtitle"></span>
+        </div>
+
+        <!-- Banner torneo aperto/chiuso -->
+        <div id="pronostici-banner" class="info-banner" style="display:none"></div>
+
+        <!-- Tabs sezioni -->
+        <div class="tab-bar" id="pronostici-tabs">
+          <button class="tab active" data-tab="tab-gironi">Gironi</button>
+          <button class="tab" data-tab="tab-riepilogo">Riepilogo</button>
+          <button class="tab" data-tab="tab-eliminatoria">Eliminatoria</button>
+          <button class="tab" data-tab="tab-tabellone">Tabellone</button>
+          <button class="tab" data-tab="tab-speciali">Marcatori</button>
+        </div>
+
+        <form id="form-pronostici">
+
+          <!-- TAB: Gironi -->
+          <div id="tab-gironi" class="tab-content active">
+            <div id="gironi-container">
+              <!-- Generato da pronostici.js -->
+            </div>
+          </div>
+
+          <!-- TAB: Riepilogo gironi -->
+          <div id="tab-riepilogo" class="tab-content">
+            <div id="riepilogo-container">
+              <!-- Generato da pronostici.js -->
+            </div>
+          </div>
+
+          <!-- TAB: Fase eliminatoria -->
+          <div id="tab-eliminatoria" class="tab-content">
+            <div class="info-banner info-banner--blue">
+              <span>📌</span>
+              <span>Pronostica le squadre che raggiungeranno ogni turno. Per ogni partita indica anche la modalità di passaggio del turno: 90 min, supplementari o rigori.</span>
+            </div>
+            <div id="eliminatoria-container">
+              <!-- Generato da pronostici.js -->
+            </div>
+          </div>
+
+          <!-- TAB: Tabellone -->
+          <div id="tab-tabellone" class="tab-content">
+            <div id="tabellone-container">
+              <!-- Generato da pronostici.js -->
+            </div>
+          </div>
+
+          <!-- TAB: Speciali -->
+          <div id="tab-speciali" class="tab-content">
+            <div id="speciali-container">
+              <!-- Capocannonieri + posizioni girone -->
+            </div>
+            <div class="elim-save-row" style="margin-top:16px">
+              <button type="button" id="btn-salva-marcatori" class="btn-salva-fase">
+                💾 Salva Marcatori
+              </button>
+              <span class="elim-save-msg" id="esm-marcatori"></span>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ── PAGINA: PROFILO ── -->
+      <div id="page-profilo" class="page">
+        <!-- Banner "torna alla classifica" (visibile solo quando si guarda il profilo altrui) -->
+        <div id="profilo-header-banner"></div>
+
+        <div class="page-header">
+          <h2 class="page-title" id="profilo-page-title">📊 Il mio profilo</h2>
+        </div>
+
+        <div id="profilo-score-card" class="score-card"></div>
+
+        <!-- Tab interni: Riepilogo / Scheda pronostici -->
+        <div class="inner-tabs" id="profilo-inner-tabs">
+          <button class="tab active" data-tab="tab-profilo-riepilogo">Riepilogo</button>
+          <button class="tab" data-tab="tab-profilo-scheda">Scheda pronostici</button>
+        </div>
+
+        <!-- TAB: Riepilogo (breakdown + partite girone) -->
+        <div id="tab-profilo-riepilogo" class="tab-content active">
+          <div id="profilo-breakdown"></div>
+          <div id="profilo-imminenti"></div>
+          <div id="profilo-partite"></div>
+        </div>
+
+        <!-- TAB: Scheda pronostici completa -->
+        <div id="tab-profilo-scheda" class="tab-content">
+          <div id="profilo-scheda-container">
+            <div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── PAGINA: ADMIN ── -->
+      <div id="page-admin" class="page">
+        <div class="page-header">
+          <h2 class="page-title">⚙️ Pannello Admin</h2>
+          <span class="page-subtitle">Verifica e correggi i risultati automatici</span>
+        </div>
+
+        <div class="admin-tabs tab-bar">
+          <button class="tab active" data-tab="tab-admin-approvazioni">
+            Approvazioni <span id="approv-badge" class="nav-badge" style="display:none;position:relative;top:-1px;right:auto;margin-left:4px"></span>
+          </button>
+          <button class="tab" data-tab="tab-admin-risultati">Risultati</button>
+          <button class="tab" data-tab="tab-admin-marcatori">⚽ Marcatori</button>
+          <button class="tab" data-tab="tab-admin-partecipanti">Partecipanti</button>
+          <button class="tab" data-tab="tab-admin-sistema">Sistema</button>
+        </div>
+
+        <div id="tab-admin-approvazioni" class="tab-content active">
+          <div id="admin-approvazioni-container">
+            <!-- Generato da admin.js -->
+          </div>
+        </div>
+
+        <div id="tab-admin-risultati" class="tab-content">
+          <div class="info-banner info-banner--yellow">
+            <span>🤖</span>
+            <span>I risultati vengono aggiornati automaticamente da football-data.org. Usa questo pannello solo per correzioni manuali.</span>
+          </div>
+          <div id="admin-risultati-container">
+            <!-- Generato da admin.js -->
+          </div>
+        </div>
+
+        <div id="tab-admin-marcatori" class="tab-content">
+          <div class="info-banner info-banner--yellow">
+            <span>⚽</span>
+            <span>Inserisci o aggiorna la classifica marcatori. Premendo "Aggiorna Marcatori" i dati compaiono subito nel tab Risultati › Marcatori.</span>
+          </div>
+          <div id="admin-marcatori-container">
+            <!-- Generato da admin.js -->
+          </div>
+        </div>
+
+        <div id="tab-admin-partecipanti" class="tab-content">
+          <div id="admin-partecipanti-container">
+            <!-- Lista partecipanti e loro stato pronostici -->
+          </div>
+        </div>
+
+        <div id="tab-admin-sistema" class="tab-content">
+          <div class="admin-sistema-grid">
+            <div class="sistema-card">
+              <h4>🔄 Sync manuale</h4>
+              <p>Forza l'aggiornamento immediato dei risultati dall'API.</p>
+              <button id="btn-sync-now" class="btn btn-secondary">Sincronizza ora</button>
+            </div>
+            <div class="sistema-card">
+              <h4>🔒 Pronostici</h4>
+              <p id="sistema-pronostici-status">—</p>
+              <button id="btn-toggle-pronostici" class="btn btn-secondary">Apri / Chiudi</button>
+            </div>
+            <div class="sistema-card">
+              <h4>📡 Stato API</h4>
+              <p id="sistema-api-status">—</p>
+              <button id="btn-check-api" class="btn btn-secondary">Verifica</button>
+            </div>
+            <div class="sistema-card">
+              <h4>🏅 Classifica</h4>
+              <p id="sistema-classifica-status">—</p>
+              <button id="btn-ricalcola-classifica" class="btn btn-primary">Ricalcola classifica</button>
+            </div>
+          </div>
+
+          <!-- Spareggio migliori terze -->
+          <div class="sistema-card sistema-card--full">
+            <h4>🏅 Spareggio migliori terze</h4>
+            <p>Riordina manualmente le 12 terze classificate in caso di parità non risolvibile con i criteri automatici (pt → GD → GF). L'ordine salvato viene usato per il calcolo dei punteggi. Le righe <span class="sp-tied-label">evidenziate</span> sono in parità perfetta.</p>
+            <div id="spareggio-terze-container">
+              <p class="text-muted">Caricamento…</p>
+            </div>
+            <div class="spareggio-save-row">
+              <button type="button" id="btn-salva-spareggio" class="btn btn-primary">💾 Salva ordine</button>
+              <span id="spareggio-save-msg"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── PAGINA: REGOLAMENTO ── -->
+      <div id="page-regolamento" class="page">
+        <div class="page-header">
+          <h2 class="page-title">📖 Regolamento</h2>
+          <span class="page-subtitle">Come si calcolano i punti</span>
+        </div>
+
+        <!-- FASE A GIRONI -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">⚽ Fase a gironi</h3>
+          <div class="reg-table-wrap">
+            <table class="reg-table">
+              <thead><tr><th>Pronostico</th><th>Punti</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="reg-label">Segno corretto (1 / X / 2)</span>
+                    <span class="reg-desc">Indovini chi vince o se è pareggio</span>
+                  </td>
+                  <td><span class="reg-pts reg-pts--s">10 pt</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="reg-label">Risultato esatto (bonus)</span>
+                    <span class="reg-desc">Indovini anche il punteggio preciso — si somma al segno</span>
+                  </td>
+                  <td><span class="reg-pts reg-pts--s">+5 pt</span></td>
+                </tr>
+                <tr class="reg-row-total">
+                  <td><span class="reg-label">Risultato esatto (totale)</span></td>
+                  <td><span class="reg-pts reg-pts--m">15 pt</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- POSIZIONI GIRONE -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">📊 Posizioni finali in griglia</h3>
+          <div class="reg-table-wrap">
+            <table class="reg-table">
+              <thead><tr><th>Pronostico</th><th>Punti</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="reg-label">Posizione corretta</span>
+                    <span class="reg-desc">Per ogni squadra piazzata nel tabellone esattamente dove previsto.</span>
+                  </td>
+                  <td><span class="reg-pts reg-pts--s">10 pt</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FASI ELIMINATORIE -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">🏟️ Fasi eliminatorie</h3>
+          <div class="info-banner info-banner--blue" style="margin-bottom:12px">
+            <span>📌</span>
+            <span>Per ogni fase indovini quali squadre ci arrivano. Il punteggio scala con l'avanzare del torneo.</span>
+          </div>
+          <div class="reg-table-wrap">
+            <table class="reg-table">
+              <thead><tr><th>Turno</th><th>Per squadra indovinata</th></tr></thead>
+              <tbody>
+                <tr><td><span class="reg-label">Sedicesimi di finale</span></td><td><span class="reg-pts reg-pts--s">5 pt</span></td></tr>
+                <tr><td><span class="reg-label">Ottavi di finale</span></td><td><span class="reg-pts reg-pts--s">10 pt</span></td></tr>
+                <tr><td><span class="reg-label">Quarti di finale</span></td><td><span class="reg-pts reg-pts--m">20 pt</span></td></tr>
+                <tr><td><span class="reg-label">Semifinali</span></td><td><span class="reg-pts reg-pts--m">30 pt</span></td></tr>
+                <tr><td><span class="reg-label">Finale (ogni finalista)</span></td><td><span class="reg-pts reg-pts--l">50 pt</span></td></tr>
+                <tr class="reg-row-highlight"><td><span class="reg-label">Vincitore del torneo</span></td><td><span class="reg-pts reg-pts--xl">70 pt</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="reg-table-wrap" style="margin-top:12px">
+            <table class="reg-table">
+              <thead><tr><th>Bonus per ogni partita eliminatoria</th><th>Punti</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="reg-label">Modalità di passaggio turno corretta</span>
+                    <span class="reg-desc">Indovini se la partita si decide in 90 min, supplementari o rigori — indipendentemente da chi vince</span>
+                  </td>
+                  <td><span class="reg-pts reg-pts--s">+5 pt</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CAPOCANNONIERE -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">👟 Capocannoniere</h3>
+          <div class="reg-table-wrap">
+            <table class="reg-table">
+              <thead><tr><th>Pronostico</th><th>Punti</th></tr></thead>
+              <tbody>
+                <tr><td><span class="reg-label">1° classificato esatto</span></td><td><span class="reg-pts reg-pts--xl">40 pt</span></td></tr>
+                <tr><td><span class="reg-label">2° classificato esatto</span></td><td><span class="reg-pts reg-pts--l">20 pt</span></td></tr>
+                <tr><td><span class="reg-label">3° classificato esatto</span></td><td><span class="reg-pts reg-pts--m">10 pt</span></td></tr>
+                <tr>
+                  <td>
+                    <span class="reg-label">Cannoniere nella terna (posizione sbagliata)</span>
+                    <span class="reg-desc">Il giocatore è tra i primi 3 ma non esattamente dove previsto</span>
+                  </td>
+                  <td><span class="reg-pts reg-pts--s">10 pt</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="info-banner" style="margin-top:10px">
+            <span>⚠️</span>
+            <span>I giocatori selezionabili sono quelli delle pre-selezioni ufficiali. Non sono sostituibili in caso di forfait.</span>
+          </div>
+        </div>
+
+        <!-- CRITERI DI SPAREGGIO -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">⚖️ Criteri di spareggio</h3>
+          <p class="reg-desc-block">In caso di parità di punteggio, la classifica viene determinata nell'ordine seguente:</p>
+          <ol class="reg-spareggio-list">
+            <li>Squadra vincente del torneo indovinata</li>
+            <li>Numero delle finaliste indovinate</li>
+            <li>Numero delle semifinaliste indovinate</li>
+            <li>Numero delle squadre ai quarti indovinate</li>
+            <li>Numero delle squadre agli ottavi indovinate</li>
+            <li>Numero di risultati esatti indovinati</li>
+            <li>Vincitore della classifica cannonieri indovinato</li>
+            <li>Numero dei posizionamenti in griglia indovinati</li>
+            <li>Numero dei cannonieri indovinati nella terna</li>
+            <li>Numero dei segni delle partite nel girone (1 / X / 2) indovinati</li>
+            <li>Numero delle modalità di passaggio turno indovinate</li>
+            <li>Smezzate</li>
+          </ol>
+        </div>
+
+        <!-- PREMI -->
+        <div class="reg-section">
+          <h3 class="reg-section-title">🏆 Premi</h3>
+          <div class="info-banner info-banner--yellow">
+            <span>📢</span>
+            <span>I premi verranno stabiliti in base al numero definitivo di partecipanti e annunciati il giorno successivo all'inizio del torneo.</span>
+          </div>
+          <div class="reg-premi-grid">
+            <div class="reg-premio">
+              <span class="reg-premio-icon">🥇</span>
+              <span class="reg-premio-label">1° classificato</span>
+            </div>
+            <div class="reg-premio">
+              <span class="reg-premio-icon">🥈</span>
+              <span class="reg-premio-label">2° classificato</span>
+            </div>
+            <div class="reg-premio">
+              <span class="reg-premio-icon">🥉</span>
+              <span class="reg-premio-label">3° classificato</span>
+            </div>
+            <div class="reg-premio">
+              <span class="reg-premio-icon">🪣</span>
+              <span class="reg-premio-label">Ultimo classificato</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTA BENE -->
+        <div class="reg-section">
+          <div class="info-banner info-banner--yellow">
+            <span>📌</span>
+            <span><strong>NB:</strong> Nei gironi, in caso di parità assoluta tra due o più squadre, l'ordine in classifica viene stabilito in base all'ordine di inserimento della squadra nella competizione. Nella classifica delle migliori terze, in caso di parità assoluta tra due o più squadre, l'ordine viene stabilito in base all'ordine alfabetico dei gironi di provenienza.</span>
+          </div>
+        </div>
+
+      </div><!-- /page-regolamento -->
+
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- MODAL -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button id="modal-close" class="btn-icon">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- FIREBASE SDK -->
+  <script type="module">
+    import { initializeApp }                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { initializeAuth, browserSessionPersistence, connectAuthEmulator } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getFirestore, connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { getFunctions, connectFunctionsEmulator } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+    // ── RILEVAMENTO AUTOMATICO AMBIENTE ──────────────
+    const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+    // Config demo per test locale (nessuna credenziale reale necessaria)
+    const firebaseConfigLocal = {
+      apiKey:            "demo-key",
+      authDomain:        "demo-mondialito.firebaseapp.com",
+      projectId:         "demo-mondialito",
+      storageBucket:     "demo-mondialito.appspot.com",
+      messagingSenderId: "000000000000",
+      appId:             "1:000000000000:web:demo000000000000"
+    };
+
+    const firebaseConfigProd = {
+      apiKey:            "AIzaSyBwb09iFSpFwgznldpSTQKT1YO2pn15Hu0",
+      authDomain:        "wimbledino-2026.firebaseapp.com",
+      projectId:         "wimbledino-2026",
+      storageBucket:     "wimbledino-2026.firebasestorage.app",
+      messagingSenderId: "138229851497",
+      appId:             "1:138229851497:web:925174468aa2f85d96c9f8"
+    };
+
+    const firebaseConfig = IS_LOCAL ? firebaseConfigLocal : firebaseConfigProd;
+    const app = initializeApp(firebaseConfig);
+
+    const auth      = initializeAuth(app, { persistence: browserSessionPersistence });
+    const db        = getFirestore(app);
+    const functions = getFunctions(app, 'europe-west1');
+
+    // Connetti agli emulatori se siamo in locale
+    if (IS_LOCAL) {
+      connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      connectFirestoreEmulator(db, 'localhost', 8080);
+      connectFunctionsEmulator(functions, 'localhost', 5001);
+      console.info('🧪 Modalità TEST — emulatori Firebase attivi');
+    }
+
+    window._firebase = { app, auth, db, functions };
+
+    // Carica l'app dopo Firebase
+    const { initApp } = await import('./js/app.js');
+    initApp();
+  </script>
+
+</body>
+</html>
