@@ -1,1 +1,43 @@
+name: Deploy Functions & Firestore Rules
 
+# Si attiva quando fai push su main e hai modificato functions/ o le regole Firestore
+# Puoi anche avviarlo manualmente da GitHub → Actions → Run workflow
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'functions/**'
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+  workflow_dispatch:   # ← trigger manuale dalla UI di GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Install Functions dependencies
+        run: npm install
+        working-directory: functions
+
+      - name: Write service account credentials
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
+
+      - name: Deploy Functions + Firestore Rules
+        run: |
+          firebase deploy \
+            --only functions,firestore \
+            --project mondialito-2026-test
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
