@@ -9,8 +9,10 @@
  */
 import { TURNI } from './bracket.js';
 
-export const WINNER_POINTS = { R128: 1, R64: 2, R32: 4, R16: 8, QF: 16, SF: 32, F: 64 };
-export const SET_POINTS    = { R128: 1, R64: 1, R32: 2, R16: 3, QF: 5,  SF: 8,  F: 13 };
+// Schema "Finale calda": i turni finali pesano di piu, per tenere la classifica
+// aperta fino all'ultima partita. (Primi 2 turni ~45% dei punti, ultimi 3 ~28%.)
+export const WINNER_POINTS = { R128: 1, R64: 2, R32: 5, R16: 12, QF: 30, SF: 75, F: 180 };
+export const SET_POINTS    = { R128: 1, R64: 1, R32: 2, R16: 4,  QF: 10, SF: 25, F: 60  };
 export const BONUS_STAT_DEFAULT = 25;
 
 function vincitoriTurno(doc, roundId) {
