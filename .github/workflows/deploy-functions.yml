@@ -37,7 +37,7 @@ jobs:
       - name: Deploy Functions + Firestore Rules
         run: |
           firebase deploy \
-            --only functions,firestore \
+            --only functions \
             --project wimbledino-2026
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
