@@ -38,6 +38,6 @@ jobs:
         run: |
           firebase deploy \
             --only functions,firestore \
-            --project mondialito-2026-test
+            --project wimbledino-2026
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
