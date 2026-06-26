@@ -165,6 +165,98 @@ export function renderTabellone(container, pron, db) {
   container.innerHTML = html;
 }
 
+// ── Render GRAFICO del tabellone completo (percorsi) ─────────────────────
+// Disegna l'albero a eliminazione diretta da 128 con connettori SVG.
+// `pron` = documento pronostici/risultati da cui leggere i vincitori per turno.
+// Read-only: evidenzia il vincitore scelto in ogni match e i percorsi.
+export function renderBracketGrafico(container, pron, db) {
+  if (!container) return;
+
+  const COL_W = 184;   // larghezza colonna (turno)
+  const BOX_W = COL_W - 22;
+  const PAD_X = 6;     // margine sinistro del box dentro la colonna
+  const MATCH_H = 42;  // altezza box match (2 slot)
+  const VGAP = 10;     // spazio fra match al 1º turno
+  const PAD_TOP = 32;  // spazio per la barra dei turni in alto
+  const ROW = MATCH_H + VGAP;
+
+  // Centri verticali di ogni match, turno per turno
+  const centers = {};
+  centers.R128 = [];
+  for (let i = 0; i < 64; i++) centers.R128[i] = PAD_TOP + i * ROW + MATCH_H / 2;
+  for (let ri = 1; ri < TURNI.length; ri++) {
+    const r = TURNI[ri].id, prev = TURNI[ri - 1].id;
+    centers[r] = [];
+    for (let i = 0; i < TURNI[ri].matches; i++) {
+      centers[r][i] = (centers[prev][2 * i] + centers[prev][2 * i + 1]) / 2;
+    }
+  }
+
+  const CHAMP_W = 150;
+  const totalH = PAD_TOP * 2 + 64 * ROW;
+  const totalW = TURNI.length * COL_W + CHAMP_W;
+
+  // Connettori SVG
+  let paths = '';
+  for (let ri = 1; ri < TURNI.length; ri++) {
+    const prev = TURNI[ri - 1].id;
+    const childRightX = (ri - 1) * COL_W + PAD_X + BOX_W;
+    const parentLeftX = ri * COL_W + PAD_X;
+    const midX = (childRightX + parentLeftX) / 2;
+    for (let i = 0; i < TURNI[ri].matches; i++) {
+      const py = centers[TURNI[ri].id][i];
+      [2 * i, 2 * i + 1].forEach(f => {
+        const cy = centers[prev][f];
+        paths += `<path d="M${childRightX},${cy} H${midX} V${py} H${parentLeftX}" class="bk-link"/>`;
+      });
+    }
+  }
+  // connettore finale → campione
+  const champ = getCampione(pron);
+  const fY = centers.F[0];
+  const fRightX = (TURNI.length - 1) * COL_W + PAD_X + BOX_W;
+  paths += `<path d="M${fRightX},${fY} H${fRightX + 24}" class="bk-link bk-link--champ"/>`;
+
+  // Etichette turni (header)
+  let heads = '';
+  TURNI.forEach((t, ri) => {
+    heads += `<div class="bk-head" style="left:${ri * COL_W + PAD_X}px;width:${BOX_W}px">${t.nome}</div>`;
+  });
+  heads += `<div class="bk-head" style="left:${TURNI.length * COL_W + 8}px;width:${CHAMP_W - 16}px">Campione</div>`;
+
+  // Box dei match
+  let boxes = '';
+  TURNI.forEach((t, ri) => {
+    for (let i = 0; i < t.matches; i++) {
+      const mid = matchId(t.id, i);
+      const { a, b } = getMatchPlayers(t.id, i, pron, db);
+      const p = getPron(pron, t.id, mid);
+      const win = (p && (p.vincitore === a || p.vincitore === b)) ? p.vincitore : null;
+      const top = centers[t.id][i] - MATCH_H / 2;
+      const left = ri * COL_W + PAD_X;
+      const slot = (pid) => {
+        if (!pid) return `<div class="bk-slot bk-empty">·</div>`;
+        const w = win === pid ? ' bk-win' : (win ? ' bk-lose' : '');
+        return `<div class="bk-slot${w}" title="${nomeGiocatore(db, pid)}">${nomeGiocatore(db, pid)}</div>`;
+      };
+      boxes += `<div class="bk-match" style="top:${top}px;left:${left}px;width:${BOX_W}px;height:${MATCH_H}px">${slot(a)}${slot(b)}</div>`;
+    }
+  });
+  // Box campione
+  if (champ) {
+    boxes += `<div class="bk-champ" style="top:${fY - 18}px;left:${TURNI.length * COL_W + 8}px;width:${CHAMP_W - 16}px">🏆 ${nomeGiocatore(db, champ)}</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="bk-scroll">
+      <div class="bk-canvas" style="width:${totalW}px;height:${totalH + PAD_TOP}px">
+        <div class="bk-heads">${heads}</div>
+        <svg class="bk-svg" width="${totalW}" height="${totalH + PAD_TOP}" viewBox="0 0 ${totalW} ${totalH + PAD_TOP}">${paths}</svg>
+        ${boxes}
+      </div>
+    </div>`;
+}
+
 // ── Render read-only dei bonus (per profilo.js) ──────────────────────────
 export function renderBonus(container, pron, db) {
   if (!container) return;

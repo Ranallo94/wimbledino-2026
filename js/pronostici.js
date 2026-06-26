@@ -15,7 +15,7 @@ import { STATE } from './app.js';
 import { getPronostici, savePronostici, onSistemaSnapshot } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
-  TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers,
+  TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers, renderBracketGrafico,
 } from './bracket.js';
 import { showToast } from './ui.js';
 
@@ -71,6 +71,7 @@ function _buildShell() {
   const tabsHtml = TURNI.map((t, i) =>
     `<button type="button" class="tab${i === 0 ? ' active' : ''}" data-tab="pron-${t.id}" data-round="${t.id}">${t.nome}</button>`
   ).join('') +
+    `<button type="button" class="tab" data-tab="pron-BRACKET" data-round="BRACKET">🗺️ Tabellone</button>` +
     `<button type="button" class="tab" data-tab="pron-BONUS" data-round="BONUS">🏆 Bonus</button>`;
 
   const contentsHtml = TURNI.map((t, i) =>
@@ -84,6 +85,11 @@ function _buildShell() {
        </div>
      </div>`
   ).join('') +
+    `<div id="pron-BRACKET" class="tab-content">
+       <div class="round-head"><h3 class="section-title">🗺️ Tabellone completo</h3>
+         <span class="round-progress-note">I tuoi percorsi pronosticati · scorri per esplorare</span></div>
+       <div id="bracket-grafico"></div>
+     </div>` +
     `<div id="pron-BONUS" class="tab-content">
        <div class="round-head"><h3 class="section-title">🏆 Bonus fine torneo</h3></div>
        <div id="bonus-box" class="bonus-form"></div>
@@ -109,6 +115,7 @@ function _buildShell() {
     tab.addEventListener('click', () => {
       const r = tab.dataset.round;
       if (r === 'BONUS') _renderBonus();
+      else if (r === 'BRACKET') renderBracketGrafico(document.getElementById('bracket-grafico'), _pron, _db);
       else _renderRound(r);
     });
   });
