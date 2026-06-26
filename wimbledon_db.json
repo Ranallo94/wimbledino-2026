@@ -1019,6 +1019,11 @@
       "id": "most_breaks",
       "label": "Tennista con più break ottenuti",
       "tipo": "giocatore"
+    },
+    {
+      "id": "most_tiebreaks",
+      "label": "Tennista con più tie-break vinti",
+      "tipo": "giocatore"
     }
   ],
   "_note": "Tabellone principale Wimbledon 2026 (singolare maschile) — sorteggio ufficiale del 26/06/2026, fonte TennisExplorer. p001..p128 in ordine di tabellone dall'alto (Sinner) al basso (Zverev). Seed = testa di serie (1-32); null = qualificato/wildcard/non testa di serie. I due Cerundolo sono distinti: F. Cerundolo (n.18) e J.M. Cerundolo. setOptions = risultati esatti per numero di set (best-of-5)."
