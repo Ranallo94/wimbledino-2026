@@ -2007,7 +2007,44 @@ select.field-input option { background: var(--bg-card2); }
   margin-bottom: 12px;
 }
 .visibility-toggle-label { font-size: 14px; font-weight: 600; }
-.visibility-toggle-desc  { font-size: 12px; color: var(--text-muted); }
+.visibility-toggle-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Interruttore on/off */
+.switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg-card2);
+  box-shadow: inset 0 0 0 1.5px var(--border);
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform var(--transition), background var(--transition);
+}
+.switch--on {
+  background: var(--oro);
+  box-shadow: inset 0 0 0 1.5px var(--oro-dark);
+}
+.switch--on .switch-knob {
+  transform: translateX(22px);
+  background: var(--text-dark);
+}
+.switch:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 /* ── IMPOSTAZIONI PROFILO ── */
 .impostazioni-form { max-width: 400px; }
