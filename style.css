@@ -2260,8 +2260,13 @@ select.field-input option { background: var(--bg-card2); }
 }
 .bk-canvas { position: relative; }
 
-/* Barra dei turni (header) */
-.bk-heads { position: absolute; top: 0; left: 0; }
+/* Barra dei turni (header) — resta agganciata in alto durante lo scroll verticale */
+.bk-heads {
+  position: sticky; top: 0;
+  height: 32px;          /* = PAD_TOP del render */
+  z-index: 5;
+  background: var(--bg);
+}
 .bk-head {
   position: absolute; top: 6px;
   font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
