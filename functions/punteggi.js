@@ -126,4 +126,3 @@ module.exports = {
   WINNER_POINTS,
   SET_POINTS,
 };
-
