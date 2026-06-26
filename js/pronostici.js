@@ -105,6 +105,15 @@ function _buildShell() {
       <span id="pronostici-status" class="page-subtitle"></span>
     </div>
     <div id="pronostici-banner" class="info-banner" style="display:none"></div>
+    <div class="visibility-toggle-bar" id="visibility-toggle-bar">
+      <div>
+        <div class="visibility-toggle-label">🙈 Nascondi il mio pronostico</div>
+        <div class="visibility-toggle-desc" id="visibility-toggle-desc"></div>
+      </div>
+      <button type="button" class="switch" id="visibility-switch" role="switch" aria-checked="false">
+        <span class="switch-knob"></span>
+      </button>
+    </div>
     <div class="tab-bar" id="pronostici-tabs">${tabsHtml}</div>
     ${contentsHtml}
   `;
@@ -128,6 +137,54 @@ function _buildShell() {
       else _salvaTurno(r, btn);
     });
   });
+
+  // Interruttore visibilità scheda
+  const sw = document.getElementById('visibility-switch');
+  if (sw) {
+    _syncVisibilitySwitch();
+    sw.addEventListener('click', _toggleVisibilita);
+  }
+}
+
+// ── VISIBILITÀ SCHEDA (nascondi pronostico) ───────────
+/** Allinea l'aspetto dell'interruttore allo stato corrente. */
+function _syncVisibilitySwitch() {
+  const sw = document.getElementById('visibility-switch');
+  const desc = document.getElementById('visibility-toggle-desc');
+  if (!sw) return;
+  const nascosto = _pron.pronostico_nascosto === true;
+  sw.classList.toggle('switch--on', nascosto);
+  sw.setAttribute('aria-checked', nascosto ? 'true' : 'false');
+  if (desc) {
+    if (!_aperti) {
+      desc.textContent = 'Pronostici chiusi: tutte le schede sono ora visibili a tutti.';
+    } else if (nascosto) {
+      desc.textContent = 'La tua scheda è nascosta agli altri finché i pronostici sono aperti.';
+    } else {
+      desc.textContent = 'La tua scheda è visibile agli altri partecipanti.';
+    }
+  }
+}
+
+/** Attiva/disattiva la visibilità e salva subito. */
+async function _toggleVisibilita() {
+  if (!_aperti) { showToast('Pronostici chiusi: le schede sono visibili a tutti.', 'warning'); return; }
+  const sw = document.getElementById('visibility-switch');
+  const nuovo = !(_pron.pronostico_nascosto === true);
+  _pron.pronostico_nascosto = nuovo;
+  _syncVisibilitySwitch();
+  if (sw) sw.disabled = true;
+  try {
+    await savePronostici(STATE.utente.id, _stripPron());
+    showToast(nuovo ? '🙈 Pronostico nascosto agli altri.' : '👁️ Pronostico di nuovo visibile.', 'success');
+  } catch (err) {
+    // Rollback in caso di errore
+    _pron.pronostico_nascosto = !nuovo;
+    _syncVisibilitySwitch();
+    showToast('Errore nel salvataggio: ' + err.message, 'error');
+  } finally {
+    if (sw) sw.disabled = !_aperti ? true : false;
+  }
 }
 
 // ── RENDER DI UN TURNO ────────────────────────────────
@@ -320,6 +377,11 @@ function _applyLockState() {
   page.querySelectorAll('[data-save]').forEach(b => {
     b.style.display = _aperti ? '' : 'none';
   });
+
+  // Interruttore visibilità: attivo solo a pronostici aperti
+  const sw = document.getElementById('visibility-switch');
+  if (sw) sw.disabled = !_aperti;
+  _syncVisibilitySwitch();
 }
 
 // ── HELPERS ───────────────────────────────────────────
