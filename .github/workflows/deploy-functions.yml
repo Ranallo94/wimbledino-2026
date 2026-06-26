@@ -38,6 +38,6 @@ jobs:
         run: |
           firebase deploy \
             --only functions \
-            --project wimbledino-2026
+            --project wimbledino-2026 --force
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
