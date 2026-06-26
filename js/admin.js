@@ -180,6 +180,28 @@ function _displayName(p) {
   return p.nickname || `${p.nome || ''} ${p.cognome || ''}`.trim() || p.id;
 }
 
+// Costruisce un link wa.me normalizzando il numero (default prefisso Italia +39)
+function _waLink(tel) {
+  if (!tel) return null;
+  let n = String(tel).replace(/[^\d+]/g, '');
+  if (n.startsWith('+')) n = n.slice(1);
+  else if (n.startsWith('00')) n = n.slice(2);
+  else if (n.startsWith('3')) n = '39' + n;       // cellulare IT senza prefisso
+  else if (n.startsWith('0')) n = '39' + n.replace(/^0+/, ''); // fisso IT
+  if (n.length < 8) return null;
+  return 'https://wa.me/' + n;
+}
+
+// Bottone WhatsApp per un partecipante (disabilitato se manca il numero)
+function _waBtn(p) {
+  const link = _waLink(p.telefono);
+  const msg = encodeURIComponent(`Ciao ${_displayName(p)}! 🎾 Ti scrivo da Wimbledino.`);
+  if (!link) {
+    return `<button type="button" class="btn btn-secondary btn-sm" disabled title="Numero non disponibile">💬 WhatsApp</button>`;
+  }
+  return `<a href="${link}?text=${msg}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" title="Scrivi su WhatsApp">💬 WhatsApp</a>`;
+}
+
 function _renderApprovazioni() {
   const box = document.getElementById('admin-approvazioni-container');
   if (!box) return;
@@ -203,6 +225,7 @@ function _renderApprovazioni() {
         <span class="admin-row-sub">${p.nome || ''} ${p.cognome || ''} · ${p.telefono || '—'} · ${p.email || '—'}</span>
       </div>
       <div class="admin-row-actions">
+        ${_waBtn(p)}
         <button type="button" class="btn btn-primary btn-sm" data-approva="${p.id}">✅ Approva</button>
         <button type="button" class="btn btn-secondary btn-sm" data-rifiuta="${p.id}">✖ Rifiuta</button>
       </div>
@@ -275,6 +298,7 @@ async function _renderPartecipanti() {
         <span class="admin-row-sub">${n} pronostici · ${p.email || '—'}${disab ? ' · disabilitato' : ''}</span>
       </div>
       <div class="admin-row-actions">
+        ${_waBtn(p)}
         <button type="button" class="btn btn-secondary btn-sm" data-toggleadmin="${p.id}" ${owner ? 'disabled title="Owner sempre admin"' : ''}>
           ${p.isAdmin ? '↓ Rimuovi admin' : '↑ Rendi admin'}
         </button>
