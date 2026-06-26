@@ -150,14 +150,11 @@ function _aggiornaProfilo(sorted) {
 // ── BREAKDOWN INLINE ──────────────────────────────────
 function _renderBreakdownInline(bd) {
   if (!bd) return '';
+  // Breakdown tennis: { esiti, set, bonus, perTurno }
   const voci = [
-    { label: 'Gironi',     punti: (bd.gironi_segno?.punti || 0) + (bd.gironi_esatto?.punti || 0) },
-    { label: 'Griglia',    punti: bd.posto_griglia?.punti || 0 },
-    { label: 'Elim.',      punti: (bd.sedicesimi?.punti || 0) + (bd.ottavi?.punti || 0)
-                                + (bd.quarti?.punti || 0) + (bd.semifinali?.punti || 0)
-                                + (bd.finale?.punti || 0) + (bd.vincitore?.punti || 0) },
-    { label: 'Cannon.',    punti: bd.capocannoniere?.punti || 0 },
-    { label: 'Modalità',   punti: bd.modalita?.punti || 0 },
+    { label: 'Esiti', punti: bd.esiti || 0 },
+    { label: 'Set',   punti: bd.set   || 0 },
+    { label: 'Bonus', punti: bd.bonus || 0 },
   ].filter(v => v.punti > 0);
 
   if (!voci.length) return '<span class="bd-empty">nessun punto ancora</span>';

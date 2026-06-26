@@ -24,6 +24,15 @@ export async function getPronostici(uid) {
 }
 
 /**
+ * Carica i pronostici di TUTTI i partecipanti (per il ricalcolo classifica).
+ * @returns {Array} [{ id, ...dati }]
+ */
+export async function getTuttiPronostici() {
+  const snap = await getDocs(collection(db(), 'pronostici'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+/**
  * Salva (sovrascrive) i pronostici di un partecipante.
  * @param {string} uid
  * @param {Object} dati
@@ -65,6 +74,18 @@ export async function patchRisultati(patch) {
   await updateDoc(doc(db(), 'risultati', 'ufficiali'), patch);
 }
 
+/**
+ * Scrive i risultati ufficiali in modalità merge (crea il documento se non esiste).
+ * Più sicuro di patchRisultati quando il documento potrebbe non esistere ancora.
+ * @param {Object} dati
+ */
+export async function setRisultati(dati) {
+  await setDoc(doc(db(), 'risultati', 'ufficiali'), {
+    ...dati,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
 // ── CLASSIFICA ────────────────────────────────────────
 
 /**
@@ -84,6 +105,17 @@ export async function getClassifica() {
 export function onClassificaSnapshot(callback) {
   return onSnapshot(doc(db(), 'classifica', 'snapshot'), (snap) => {
     callback(snap.exists() ? (snap.data().partecipanti || []) : []);
+  });
+}
+
+/**
+ * Salva (sovrascrive) la classifica pre-calcolata. Usato dal ricalcolo manuale admin.
+ * @param {Array} partecipanti  [{ id, nome, totale, breakdown, spareggio }]
+ */
+export async function saveClassifica(partecipanti) {
+  await setDoc(doc(db(), 'classifica', 'snapshot'), {
+    partecipanti,
+    updatedAt: serverTimestamp(),
   });
 }
 
