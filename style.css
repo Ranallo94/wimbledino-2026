@@ -2138,3 +2138,109 @@ select.field-input option { background: var(--bg-card2); }
   .marc-edit-table input.marc-f-assist,
   .marc-edit-table input.marc-f-rigori { max-width: 100%; text-align: left; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   WIMBLEDINO — Tabellone pronostici / admin (componenti tennis)
+   Stili scopati sotto i nuovi contenitori per non interferire con
+   le card "match" della pagina Risultati live (Mondialito).
+   ════════════════════════════════════════════════════════════════ */
+
+/* Intestazione turno + progress */
+.round-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 6px 0 12px; }
+.round-progress {
+  font-size: 13px; font-weight: 700; color: var(--text-dark);
+  background: var(--oro); border-radius: 999px; padding: 2px 10px; white-space: nowrap;
+}
+
+/* Lista match del turno */
+.round-matches { display: grid; gap: 10px; }
+
+/* Card di una singola partita (override scopato) */
+.round-matches .match-card {
+  display: grid; grid-template-columns: 28px 1fr; align-items: center;
+  gap: 6px 12px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin: 0;
+}
+.round-matches .match-card.match-done { border-color: var(--verde-light); background: var(--bg-card2); }
+.round-matches .match-card.match-locked { opacity: .6; grid-template-columns: 28px 1fr; }
+.round-matches .match-num { font-size: 12px; font-weight: 700; color: var(--text-muted); text-align: center; }
+.round-matches .match-locked-msg { font-size: 13px; color: var(--text-muted); font-style: italic; }
+
+/* Riga dei due giocatori (override del flex Mondialito) */
+.round-matches .match-teams {
+  display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; margin: 0;
+}
+.round-matches .match-vs { align-self: center; font-size: 12px; color: var(--text-muted); }
+
+/* Pulsante-giocatore selezionabile (override scopato di .match-team) */
+.round-matches .match-team {
+  flex: 1 1 0; min-width: 120px; display: block; text-align: left;
+  background: var(--bg-card2); border: 1.5px solid var(--border);
+  color: var(--text); border-radius: var(--radius-sm);
+  padding: 9px 12px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.round-matches .match-team:hover:not(:disabled) { border-color: var(--verde-light); }
+.round-matches .match-team.selected {
+  border-color: var(--verde-light); background: var(--verde);
+  color: #fff; box-shadow: 0 0 0 1px var(--verde-light) inset;
+}
+.round-matches .match-team--empty { color: var(--text-muted); cursor: default; }
+.round-matches .match-team:disabled { cursor: not-allowed; opacity: .7; }
+
+/* Selettore numero di set */
+.round-matches .match-set {
+  grid-column: 2; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.round-matches .match-set--hidden { display: none; }
+.round-matches .match-set-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-right: 2px; }
+.round-matches .set-opt {
+  background: var(--bg-card2); border: 1.5px solid var(--border); color: var(--text);
+  border-radius: 999px; padding: 3px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.round-matches .set-opt:hover:not(:disabled) { border-color: var(--oro); }
+.round-matches .set-opt.selected { background: var(--oro); color: var(--text-dark); border-color: var(--oro); }
+.round-matches .set-opt:disabled { cursor: not-allowed; opacity: .7; }
+
+/* Form bonus (pronostici + admin) */
+.bonus-form { display: grid; gap: 14px; }
+.bonus-field { display: flex; flex-direction: column; gap: 6px; }
+.bonus-field-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.bonus-select {
+  background: var(--bg-card2); border: 1.5px solid var(--border); color: var(--text);
+  border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px;
+}
+.bonus-select:focus { outline: none; border-color: var(--verde-light); }
+.bonus-select option { background: var(--bg-card2); }
+
+/* Righe admin (approvazioni / partecipanti) */
+.admin-part-list { display: grid; gap: 8px; }
+.admin-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px;
+}
+.admin-row--off { opacity: .55; }
+.admin-row-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.admin-row-nome { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.admin-row-sub { font-size: 12px; color: var(--text-muted); }
+.admin-row-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+/* Badge admin/owner se non già definiti altrove */
+.badge-admin, .badge-owner {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 999px;
+}
+.badge-admin { background: var(--oro); color: var(--text-dark); }
+.badge-owner { background: var(--verde); color: #fff; }
+
+/* Stato salvataggio inline */
+.elim-save-msg.ok { color: var(--verde-light); }
+.elim-save-msg.err { color: var(--rosso, #e53e3e); }
+
+@media (max-width: 560px) {
+  .round-matches .match-team { min-width: 100%; }
+  .admin-row { flex-direction: column; align-items: stretch; }
+  .admin-row-actions { justify-content: flex-start; }
+}

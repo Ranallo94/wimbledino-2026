@@ -47,643 +47,643 @@
   ],
   "giocatori": {
     "p001": {
-      "nome": "",
-      "seed": null,
+      "nome": "Sinner",
+      "seed": 1,
       "naz": ""
     },
     "p002": {
-      "nome": "",
+      "nome": "Kecmanovic",
       "seed": null,
       "naz": ""
     },
     "p003": {
-      "nome": "",
+      "nome": "Borges",
       "seed": null,
       "naz": ""
     },
     "p004": {
-      "nome": "",
+      "nome": "Boyer",
       "seed": null,
       "naz": ""
     },
     "p005": {
-      "nome": "",
+      "nome": "Vukic",
       "seed": null,
       "naz": ""
     },
     "p006": {
-      "nome": "",
+      "nome": "Brooksby",
       "seed": null,
       "naz": ""
     },
     "p007": {
-      "nome": "",
+      "nome": "Nava",
       "seed": null,
       "naz": ""
     },
     "p008": {
-      "nome": "",
-      "seed": null,
+      "nome": "Buse",
+      "seed": 31,
       "naz": ""
     },
     "p009": {
-      "nome": "",
-      "seed": null,
+      "nome": "Jodar",
+      "seed": 23,
       "naz": ""
     },
     "p010": {
-      "nome": "",
+      "nome": "Gill",
       "seed": null,
       "naz": ""
     },
     "p011": {
-      "nome": "",
+      "nome": "Shapovalov",
       "seed": null,
       "naz": ""
     },
     "p012": {
-      "nome": "",
+      "nome": "Carreno-Busta",
       "seed": null,
       "naz": ""
     },
     "p013": {
-      "nome": "",
+      "nome": "Mochizuki",
       "seed": null,
       "naz": ""
     },
     "p014": {
-      "nome": "",
+      "nome": "Basing",
       "seed": null,
       "naz": ""
     },
     "p015": {
-      "nome": "",
+      "nome": "Quinn",
       "seed": null,
       "naz": ""
     },
     "p016": {
-      "nome": "",
-      "seed": null,
+      "nome": "Darderi",
+      "seed": 14,
       "naz": ""
     },
     "p017": {
-      "nome": "",
-      "seed": null,
+      "nome": "Ruud",
+      "seed": 11,
       "naz": ""
     },
     "p018": {
-      "nome": "",
+      "nome": "Hurkacz",
       "seed": null,
       "naz": ""
     },
     "p019": {
-      "nome": "",
+      "nome": "Medjedovic",
       "seed": null,
       "naz": ""
     },
     "p020": {
-      "nome": "",
+      "nome": "Ofner",
       "seed": null,
       "naz": ""
     },
     "p021": {
-      "nome": "",
+      "nome": "Kwon",
       "seed": null,
       "naz": ""
     },
     "p022": {
-      "nome": "",
+      "nome": "Landaluce",
       "seed": null,
       "naz": ""
     },
     "p023": {
-      "nome": "",
+      "nome": "Muller",
       "seed": null,
       "naz": ""
     },
     "p024": {
-      "nome": "",
-      "seed": null,
+      "nome": "Paul",
+      "seed": 21,
       "naz": ""
     },
     "p025": {
-      "nome": "",
-      "seed": null,
+      "nome": "Nakashima",
+      "seed": 28,
       "naz": ""
     },
     "p026": {
-      "nome": "",
+      "nome": "Pinnington Jones",
       "seed": null,
       "naz": ""
     },
     "p027": {
-      "nome": "",
+      "nome": "Struff",
       "seed": null,
       "naz": ""
     },
     "p028": {
-      "nome": "",
+      "nome": "Baez",
       "seed": null,
       "naz": ""
     },
     "p029": {
-      "nome": "",
+      "nome": "Ugo Carabelli",
       "seed": null,
       "naz": ""
     },
     "p030": {
-      "nome": "",
+      "nome": "Merida Aguilar",
       "seed": null,
       "naz": ""
     },
     "p031": {
-      "nome": "",
+      "nome": "Cilic",
       "seed": null,
       "naz": ""
     },
     "p032": {
-      "nome": "",
-      "seed": null,
+      "nome": "Medvedev",
+      "seed": 8,
       "naz": ""
     },
     "p033": {
-      "nome": "",
-      "seed": null,
+      "nome": "Auger Aliassime",
+      "seed": 3,
       "naz": ""
     },
     "p034": {
-      "nome": "",
+      "nome": "Shevchenko",
       "seed": null,
       "naz": ""
     },
     "p035": {
-      "nome": "",
+      "nome": "Walton",
       "seed": null,
       "naz": ""
     },
     "p036": {
-      "nome": "",
+      "nome": "Prizmic",
       "seed": null,
       "naz": ""
     },
     "p037": {
-      "nome": "",
+      "nome": "Vallejo",
       "seed": null,
       "naz": ""
     },
     "p038": {
-      "nome": "",
+      "nome": "Mejia",
       "seed": null,
       "naz": ""
     },
     "p039": {
-      "nome": "",
+      "nome": "Zheng",
       "seed": null,
       "naz": ""
     },
     "p040": {
-      "nome": "",
-      "seed": null,
+      "nome": "Norrie",
+      "seed": 26,
       "naz": ""
     },
     "p041": {
-      "nome": "",
-      "seed": null,
+      "nome": "Davidovich Fokina",
+      "seed": 22,
       "naz": ""
     },
     "p042": {
-      "nome": "",
+      "nome": "J.M. Cerundolo",
       "seed": null,
       "naz": ""
     },
     "p043": {
-      "nome": "",
+      "nome": "Tirante",
       "seed": null,
       "naz": ""
     },
     "p044": {
-      "nome": "",
+      "nome": "Marozsan",
       "seed": null,
       "naz": ""
     },
     "p045": {
-      "nome": "",
+      "nome": "Van Assche",
       "seed": null,
       "naz": ""
     },
     "p046": {
-      "nome": "",
+      "nome": "Fucsovics",
       "seed": null,
       "naz": ""
     },
     "p047": {
-      "nome": "",
+      "nome": "Svrcina",
       "seed": null,
       "naz": ""
     },
     "p048": {
-      "nome": "",
-      "seed": null,
+      "nome": "Tien",
+      "seed": 16,
       "naz": ""
     },
     "p049": {
-      "nome": "",
-      "seed": null,
+      "nome": "Rublev",
+      "seed": 12,
       "naz": ""
     },
     "p050": {
-      "nome": "",
+      "nome": "Safiullin",
       "seed": null,
       "naz": ""
     },
     "p051": {
-      "nome": "",
+      "nome": "Kovacevic",
       "seed": null,
       "naz": ""
     },
     "p052": {
-      "nome": "",
+      "nome": "Van De Zandschulp",
       "seed": null,
       "naz": ""
     },
     "p053": {
-      "nome": "",
+      "nome": "De Jong",
       "seed": null,
       "naz": ""
     },
     "p054": {
-      "nome": "",
+      "nome": "Hijikata",
       "seed": null,
       "naz": ""
     },
     "p055": {
-      "nome": "",
+      "nome": "Bautista-Agut",
       "seed": null,
       "naz": ""
     },
     "p056": {
-      "nome": "",
-      "seed": null,
+      "nome": "Fonseca",
+      "seed": 24,
       "naz": ""
     },
     "p057": {
-      "nome": "",
-      "seed": null,
+      "nome": "Rinderknech",
+      "seed": 25,
       "naz": ""
     },
     "p058": {
-      "nome": "",
+      "nome": "Tarvet",
       "seed": null,
       "naz": ""
     },
     "p059": {
-      "nome": "",
+      "nome": "Trungelliti",
       "seed": null,
       "naz": ""
     },
     "p060": {
-      "nome": "",
+      "nome": "Damm",
       "seed": null,
       "naz": ""
     },
     "p061": {
-      "nome": "",
+      "nome": "Gaston",
       "seed": null,
       "naz": ""
     },
     "p062": {
-      "nome": "",
+      "nome": "Tsitsipas",
       "seed": null,
       "naz": ""
     },
     "p063": {
-      "nome": "",
+      "nome": "Wu",
       "seed": null,
       "naz": ""
     },
     "p064": {
-      "nome": "",
-      "seed": null,
+      "nome": "Djokovic",
+      "seed": 7,
       "naz": ""
     },
     "p065": {
-      "nome": "",
-      "seed": null,
+      "nome": "De Minaur",
+      "seed": 5,
       "naz": ""
     },
     "p066": {
-      "nome": "",
+      "nome": "Burruchaga",
       "seed": null,
       "naz": ""
     },
     "p067": {
-      "nome": "",
+      "nome": "Mannarino",
       "seed": null,
       "naz": ""
     },
     "p068": {
-      "nome": "",
+      "nome": "Droguet",
       "seed": null,
       "naz": ""
     },
     "p069": {
-      "nome": "",
+      "nome": "Bellucci",
       "seed": null,
       "naz": ""
     },
     "p070": {
-      "nome": "",
+      "nome": "Svajda",
       "seed": null,
       "naz": ""
     },
     "p071": {
-      "nome": "",
+      "nome": "Majchrzak",
       "seed": null,
       "naz": ""
     },
     "p072": {
-      "nome": "",
-      "seed": null,
+      "nome": "Tabilo",
+      "seed": 30,
       "naz": ""
     },
     "p073": {
-      "nome": "",
-      "seed": null,
+      "nome": "Khachanov",
+      "seed": 19,
       "naz": ""
     },
     "p074": {
-      "nome": "",
+      "nome": "Harris",
       "seed": null,
       "naz": ""
     },
     "p075": {
-      "nome": "",
+      "nome": "Hanfmann",
       "seed": null,
       "naz": ""
     },
     "p076": {
-      "nome": "",
+      "nome": "Mpetshi Perricard",
       "seed": null,
       "naz": ""
     },
     "p077": {
-      "nome": "",
+      "nome": "Griekspoor",
       "seed": null,
       "naz": ""
     },
     "p078": {
-      "nome": "",
+      "nome": "Duckworth",
       "seed": null,
       "naz": ""
     },
     "p079": {
-      "nome": "",
+      "nome": "Navone",
       "seed": null,
       "naz": ""
     },
     "p080": {
-      "nome": "",
-      "seed": null,
+      "nome": "Cobolli",
+      "seed": 9,
       "naz": ""
     },
     "p081": {
-      "nome": "",
-      "seed": null,
+      "nome": "Mensik",
+      "seed": 15,
       "naz": ""
     },
     "p082": {
-      "nome": "",
+      "nome": "Samuel",
       "seed": null,
       "naz": ""
     },
     "p083": {
-      "nome": "",
+      "nome": "Sweeny",
       "seed": null,
       "naz": ""
     },
     "p084": {
-      "nome": "",
+      "nome": "Dimitrov",
       "seed": null,
       "naz": ""
     },
     "p085": {
-      "nome": "",
+      "nome": "Wawrinka",
       "seed": null,
       "naz": ""
     },
     "p086": {
-      "nome": "",
+      "nome": "Berrettini",
       "seed": null,
       "naz": ""
     },
     "p087": {
-      "nome": "",
+      "nome": "Collignon",
       "seed": null,
       "naz": ""
     },
     "p088": {
-      "nome": "",
-      "seed": null,
+      "nome": "Fils",
+      "seed": 20,
       "naz": ""
     },
     "p089": {
-      "nome": "",
-      "seed": null,
+      "nome": "Humbert",
+      "seed": 27,
       "naz": ""
     },
     "p090": {
-      "nome": "",
+      "nome": "Bergs",
       "seed": null,
       "naz": ""
     },
     "p091": {
-      "nome": "",
+      "nome": "Shimabukuro",
       "seed": null,
       "naz": ""
     },
     "p092": {
-      "nome": "",
+      "nome": "Faria",
       "seed": null,
       "naz": ""
     },
     "p093": {
-      "nome": "",
+      "nome": "Dzumhur",
       "seed": null,
       "naz": ""
     },
     "p094": {
-      "nome": "",
+      "nome": "Fery",
       "seed": null,
       "naz": ""
     },
     "p095": {
-      "nome": "",
+      "nome": "Virtanen",
       "seed": null,
       "naz": ""
     },
     "p096": {
-      "nome": "",
-      "seed": null,
+      "nome": "Shelton",
+      "seed": 4,
       "naz": ""
     },
     "p097": {
-      "nome": "",
-      "seed": null,
+      "nome": "Fritz",
+      "seed": 6,
       "naz": ""
     },
     "p098": {
-      "nome": "",
+      "nome": "Draper",
       "seed": null,
       "naz": ""
     },
     "p099": {
-      "nome": "",
+      "nome": "Kypson",
       "seed": null,
       "naz": ""
     },
     "p100": {
-      "nome": "",
+      "nome": "McDonald",
       "seed": null,
       "naz": ""
     },
     "p101": {
-      "nome": "",
+      "nome": "Bonzi",
       "seed": null,
       "naz": ""
     },
     "p102": {
-      "nome": "",
+      "nome": "Diallo",
       "seed": null,
       "naz": ""
     },
     "p103": {
-      "nome": "",
+      "nome": "Sonego",
       "seed": null,
       "naz": ""
     },
     "p104": {
-      "nome": "",
-      "seed": null,
+      "nome": "Etcheverry",
+      "seed": 29,
       "naz": ""
     },
     "p105": {
-      "nome": "",
-      "seed": null,
+      "nome": "Tiafoe",
+      "seed": 17,
       "naz": ""
     },
     "p106": {
-      "nome": "",
+      "nome": "Atmane",
       "seed": null,
       "naz": ""
     },
     "p107": {
-      "nome": "",
+      "nome": "Kopriva",
       "seed": null,
       "naz": ""
     },
     "p108": {
-      "nome": "",
+      "nome": "Choinski",
       "seed": null,
       "naz": ""
     },
     "p109": {
-      "nome": "",
+      "nome": "Jacquet",
       "seed": null,
       "naz": ""
     },
     "p110": {
-      "nome": "",
+      "nome": "Gaubas",
       "seed": null,
       "naz": ""
     },
     "p111": {
-      "nome": "",
+      "nome": "Kokkinakis",
       "seed": null,
       "naz": ""
     },
     "p112": {
-      "nome": "",
-      "seed": null,
+      "nome": "Bublik",
+      "seed": 10,
       "naz": ""
     },
     "p113": {
-      "nome": "",
-      "seed": null,
+      "nome": "Lehecka",
+      "seed": 13,
       "naz": ""
     },
     "p114": {
-      "nome": "",
+      "nome": "Popyrin",
       "seed": null,
       "naz": ""
     },
     "p115": {
-      "nome": "",
+      "nome": "Molcan",
       "seed": null,
       "naz": ""
     },
     "p116": {
-      "nome": "",
+      "nome": "Altmaier",
       "seed": null,
       "naz": ""
     },
     "p117": {
-      "nome": "",
+      "nome": "Michelsen",
       "seed": null,
       "naz": ""
     },
     "p118": {
-      "nome": "",
+      "nome": "Fearnley",
       "seed": null,
       "naz": ""
     },
     "p119": {
-      "nome": "",
+      "nome": "Munar",
       "seed": null,
       "naz": ""
     },
     "p120": {
-      "nome": "",
-      "seed": null,
+      "nome": "F. Cerundolo",
+      "seed": 18,
       "naz": ""
     },
     "p121": {
-      "nome": "",
-      "seed": null,
+      "nome": "Arnaldi",
+      "seed": 32,
       "naz": ""
     },
     "p122": {
-      "nome": "",
+      "nome": "Halys",
       "seed": null,
       "naz": ""
     },
     "p123": {
-      "nome": "",
+      "nome": "Moutet",
       "seed": null,
       "naz": ""
     },
     "p124": {
-      "nome": "",
+      "nome": "Giron",
       "seed": null,
       "naz": ""
     },
     "p125": {
-      "nome": "",
+      "nome": "Royer",
       "seed": null,
       "naz": ""
     },
     "p126": {
-      "nome": "",
+      "nome": "Wendelken",
       "seed": null,
       "naz": ""
     },
     "p127": {
-      "nome": "",
+      "nome": "Blockx",
       "seed": null,
       "naz": ""
     },
     "p128": {
-      "nome": "",
-      "seed": null,
+      "nome": "Zverev",
+      "seed": 2,
       "naz": ""
     }
   },
@@ -1021,5 +1021,5 @@
       "tipo": "giocatore"
     }
   ],
-  "_note": "Placeholder p001..p128 e accoppiamenti draw_R128 da sostituire con il sorteggio ufficiale. setOptions = risultati esatti per numero di set (best-of-5)."
+  "_note": "Tabellone principale Wimbledon 2026 (singolare maschile) — sorteggio ufficiale del 26/06/2026, fonte TennisExplorer. p001..p128 in ordine di tabellone dall'alto (Sinner) al basso (Zverev). Seed = testa di serie (1-32); null = qualificato/wildcard/non testa di serie. I due Cerundolo sono distinti: F. Cerundolo (n.18) e J.M. Cerundolo. setOptions = risultati esatti per numero di set (best-of-5)."
 }
