@@ -1700,6 +1700,19 @@ select.field-input option { background: var(--bg-card2); }
   color: var(--text-primary);
 }
 
+.reg-premio-perc {
+  margin-left: auto;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--oro);
+  letter-spacing: .3px;
+}
+
+.reg-premio-perc--none {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 /* ── Sedicesimi: descrizione slot bracket ── */
 .elim-bracket-desc {
   font-size: 11px;
@@ -2348,3 +2361,103 @@ select.field-input option { background: var(--bg-card2); }
   border-radius: 6px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   WIMBLEDINO — Ranking accanto al nome + scheda giocatore (modal)
+   ════════════════════════════════════════════════════════════════ */
+
+/* Lato match: pulsante-giocatore + bottone info affiancati */
+.round-matches .match-side {
+  flex: 1 1 0; min-width: 120px; display: flex; align-items: stretch; gap: 6px;
+}
+.round-matches .match-side .match-team {
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+}
+.round-matches .match-side .match-team .mt-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Badge ranking ATP */
+.rank-badge {
+  flex: 0 0 auto; font-size: 11px; font-weight: 800; line-height: 1;
+  padding: 3px 7px; border-radius: 999px;
+  background: var(--oro); color: var(--text-dark);
+}
+.match-team.selected .rank-badge { background: #fff; color: var(--verde-dark); }
+.rank-badge--na { background: transparent; color: var(--text-muted); font-weight: 700; padding: 3px 4px; }
+
+/* Bottone info (apre la scheda) */
+.player-info-btn {
+  flex: 0 0 auto; width: 34px; align-self: stretch;
+  background: var(--bg-card2); border: 1.5px solid var(--border);
+  color: var(--text-muted); border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 700; line-height: 1;
+  transition: border-color var(--transition), color var(--transition);
+}
+.player-info-btn:hover { border-color: var(--oro); color: var(--oro); }
+
+@media (max-width: 560px) {
+  .round-matches .match-side { min-width: 100%; }
+}
+
+/* ── Scheda giocatore (contenuto del modal) ── */
+.pc { display: flex; flex-direction: column; gap: 18px; }
+.pc-head { display: flex; gap: 14px; align-items: center; }
+.pc-avatar {
+  width: 68px; height: 68px; border-radius: 50%; object-fit: cover;
+  background: var(--bg-card2); border: 2px solid var(--border); flex: 0 0 auto;
+}
+.pc-avatar--ph { display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.pc-headmain { min-width: 0; }
+.pc-name { font-size: 20px; font-weight: 900; color: var(--text); line-height: 1.2; }
+.pc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 5px; font-size: 13px; color: var(--text-muted); }
+.pc-meta2 { margin-top: 6px; }
+.pc-dot { color: var(--border); }
+.pc-rank { font-weight: 800; color: var(--oro); }
+.pc-rank--na { color: var(--text-muted); }
+.pc-seed { font-weight: 600; }
+.pc-up { color: var(--verde-light); font-weight: 800; }
+.pc-down { color: var(--rosso); font-weight: 800; }
+.pc-naz { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text); }
+.pc-status { background: var(--rosso); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.pc-flag { width: 20px; height: auto; border-radius: 3px; vertical-align: middle; }
+
+.pc-section-title {
+  font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.pc-loading { color: var(--text-muted); font-style: italic; }
+
+/* Anagrafica */
+.pc-dl { display: grid; gap: 0; }
+.pc-dl-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.pc-dl-row:last-child { border-bottom: none; }
+.pc-dl dt { color: var(--text-muted); font-size: 13px; }
+.pc-dl dd { color: var(--text); font-size: 13px; font-weight: 600; text-align: right; display: flex; align-items: center; gap: 6px; }
+
+/* Forma recente */
+.pc-formhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.pc-record { font-size: 16px; font-weight: 900; color: var(--text); }
+.pc-dots { display: inline-flex; gap: 4px; }
+.pc-dotres {
+  width: 22px; height: 22px; border-radius: 50%; display: inline-flex;
+  align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff;
+}
+.pc-dotres.win { background: var(--verde-light); }
+.pc-dotres.loss { background: var(--rosso); }
+.pc-matchlist { display: flex; flex-direction: column; gap: 8px; }
+.pc-match {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 12px;
+}
+.pc-match-l { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.pc-res { font-weight: 800; }
+.pc-res.win { color: var(--verde-light); }
+.pc-res.loss { color: var(--rosso); }
+.pc-score { font-weight: 800; color: var(--text); }
+.pc-vs { color: var(--text); display: inline-flex; align-items: center; gap: 5px; }
+.pc-match-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
