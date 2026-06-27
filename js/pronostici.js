@@ -18,6 +18,7 @@ import {
   TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers, renderBracketGrafico,
 } from './bracket.js';
 import { showToast } from './ui.js';
+import { rankBadge, infoBtn, openSchedaGiocatore } from './giocatore.js';
 
 let _db = null;
 let _pron = null;          // copia di lavoro dei pronostici dell'utente
@@ -210,11 +211,16 @@ function _renderRound(roundId) {
       continue;
     }
 
-    const opt = (pid) => {
-      if (!pid) return `<button type="button" class="match-team match-team--empty" disabled>—</button>`;
+    // Un "lato" = pulsante-giocatore (scelta vincitore) + bottone info (scheda)
+    const side = (pid) => {
+      if (!pid) return `<div class="match-side"><button type="button" class="match-team match-team--empty" disabled>—</button></div>`;
       const sel = vinc === pid ? ' selected' : '';
-      return `<button type="button" class="match-team${sel}" data-mid="${mid}" data-pid="${pid}" data-round="${roundId}">
-        ${nomeGiocatore(_db, pid)}</button>`;
+      return `<div class="match-side">
+        <button type="button" class="match-team${sel}" data-mid="${mid}" data-pid="${pid}" data-round="${roundId}">
+          <span class="mt-name">${nomeGiocatore(_db, pid)}</span>${rankBadge(_db, pid)}
+        </button>
+        ${infoBtn(pid)}
+      </div>`;
     };
 
     const setBtns = SET_OPTIONS.map(s =>
@@ -223,7 +229,7 @@ function _renderRound(roundId) {
 
     html += `<div class="match-card${vinc ? ' match-done' : ''}" data-mid="${mid}">
       <span class="match-num">${i + 1}</span>
-      <div class="match-teams">${opt(a)}<span class="match-vs">vs</span>${opt(b)}</div>
+      <div class="match-teams">${side(a)}<span class="match-vs">vs</span>${side(b)}</div>
       <div class="match-set${vinc ? '' : ' match-set--hidden'}"><span class="match-set-label">set</span>${setBtns}</div>
     </div>`;
   }
@@ -252,6 +258,13 @@ function _renderRound(roundId) {
       _renderRound(round);
     });
   });
+  // Listener: apertura scheda giocatore (funziona anche a pronostici chiusi)
+  box.querySelectorAll('.player-info-btn[data-info]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSchedaGiocatore(_db, btn.dataset.info);
+    });
+  });
 
   _applyLockState();
 }
@@ -267,7 +280,11 @@ function _renderBonus() {
   const ids = Object.keys(_db.giocatori || {});
   ids.sort((x, y) => nomeGiocatore(_db, x).localeCompare(nomeGiocatore(_db, y), 'it'));
   const optsHtml = (sel) => '<option value="">— scegli —</option>' +
-    ids.map(pid => `<option value="${pid}"${sel === pid ? ' selected' : ''}>${nomeGiocatore(_db, pid)}</option>`).join('');
+    ids.map(pid => {
+      const rk = _db.giocatori?.[pid]?.rank;
+      const label = nomeGiocatore(_db, pid) + (rk ? ` · ATP #${rk}` : '');
+      return `<option value="${pid}"${sel === pid ? ' selected' : ''}>${label}</option>`;
+    }).join('');
 
   box.innerHTML = cats.map(c => {
     const sel = _pron.bonus?.[c.id] || '';
