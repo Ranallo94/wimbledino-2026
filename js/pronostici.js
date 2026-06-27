@@ -15,7 +15,7 @@ import { STATE } from './app.js';
 import { getPronostici, savePronostici, onSistemaSnapshot } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
-  TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers, renderBracketGrafico,
+  TURNI, SET_OPTIONS, matchId, matchIndex, getPron, getMatchPlayers, renderBracketGrafico,
 } from './bracket.js';
 import { showToast } from './ui.js';
 import { rankBadge, infoBtn, openSchedaGiocatore } from './giocatore.js';
@@ -231,6 +231,10 @@ function _renderRound(roundId) {
       <span class="match-num">${i + 1}</span>
       <div class="match-teams">${side(a)}<span class="match-vs">vs</span>${side(b)}</div>
       <div class="match-set${vinc ? '' : ' match-set--hidden'}"><span class="match-set-label">set</span>${setBtns}</div>
+      <div class="match-actions">
+        <button type="button" class="lucky-btn" data-lucky="${mid}" data-round="${roundId}"
+          title="Sceglie a caso vincitore e numero di set">🎲 Mi sento fortunato</button>
+      </div>
     </div>`;
   }
 
@@ -263,6 +267,15 @@ function _renderRound(roundId) {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       openSchedaGiocatore(_db, btn.dataset.info);
+    });
+  });
+  // Listener: "Mi sento fortunato" → esito + set casuali
+  box.querySelectorAll('.lucky-btn[data-lucky]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!_aperti) return;
+      const { lucky, round } = btn.dataset;
+      _luckyPick(round, lucky);
+      _renderRound(round);
     });
   });
 
@@ -320,6 +333,18 @@ function _setSet(roundId, mid, set) {
   const cur = _pron.bracket[roundId]?.[mid];
   if (!cur || !cur.vincitore) return;
   cur.set = (cur.set === set) ? '' : set; // toggle
+}
+
+/** "Mi sento fortunato": vincitore casuale tra i due giocatori + set casuale. */
+function _luckyPick(roundId, mid) {
+  // Ricava i due giocatori del match (gli accoppiamenti dipendono dal turno precedente)
+  const { a, b } = getMatchPlayers(roundId, matchIndex(mid), _pron, _db);
+  const opts = [a, b].filter(Boolean);
+  if (!opts.length) return; // match non ancora definito
+  const vincitore = opts[Math.floor(Math.random() * opts.length)];
+  const set = SET_OPTIONS[Math.floor(Math.random() * SET_OPTIONS.length)];
+  if (!_pron.bracket[roundId]) _pron.bracket[roundId] = {};
+  _pron.bracket[roundId][mid] = { vincitore, set };
 }
 
 // ── SALVATAGGIO ───────────────────────────────────────
@@ -387,7 +412,7 @@ function _applyLockState() {
   }
 
   // Disabilita/abilita input e nascondi/mostra i pulsanti salva
-  page.querySelectorAll('.match-team, .set-opt, .bonus-select').forEach(el => {
+  page.querySelectorAll('.match-team, .set-opt, .bonus-select, .lucky-btn').forEach(el => {
     if (_aperti) el.removeAttribute('disabled');
     else el.setAttribute('disabled', 'disabled');
   });
