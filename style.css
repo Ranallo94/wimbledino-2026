@@ -2401,6 +2401,17 @@ select.field-input option { background: var(--bg-card2); }
   .round-matches .match-side { min-width: 100%; }
 }
 
+/* Tasto "Mi sento fortunato" (esito + set casuali) */
+.round-matches .match-actions { grid-column: 2; display: flex; justify-content: flex-end; }
+.lucky-btn {
+  background: var(--bg-card2); border: 1.5px solid var(--oro);
+  color: var(--oro); border-radius: 999px;
+  padding: 5px 12px; font-size: 12px; font-weight: 700;
+  transition: background var(--transition), color var(--transition);
+}
+.lucky-btn:hover:not(:disabled) { background: var(--oro); color: var(--text-dark); }
+.lucky-btn:disabled { cursor: not-allowed; opacity: .5; }
+
 /* ── Scheda giocatore (contenuto del modal) ── */
 .pc { display: flex; flex-direction: column; gap: 18px; }
 .pc-head { display: flex; gap: 14px; align-items: center; }
