@@ -46,8 +46,12 @@ service cloud.firestore {
     // Il proprietario può scrivere la propria scheda SOLO a pronostici aperti
     // (sistema/config.pronostici_aperti). Gli admin possono sempre scrivere
     // (correzioni manuali a torneo in corso).
+    // Allineata al frontend (cfg?.pronostici_aperti !== false): se il documento
+    // di config o il campo mancano, i pronostici sono APERTI. Vengono chiusi solo
+    // quando l'admin imposta esplicitamente pronostici_aperti == false.
     function pronosticiAperti() {
-      return get(/databases/$(database)/documents/sistema/config).data.get('pronostici_aperti', false) == true;
+      return !exists(/databases/$(database)/documents/sistema/config) ||
+        get(/databases/$(database)/documents/sistema/config).data.get('pronostici_aperti', true) == true;
     }
     match /pronostici/{uid} {
       allow read:  if isApprovato();
