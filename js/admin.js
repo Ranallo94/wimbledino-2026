@@ -13,9 +13,9 @@
 
 import { STATE } from './app.js';
 import {
-  getPartecipanti, updatePartecipante,
+  getPartecipanti, updatePartecipante, setPagamento,
   getRisultati, setRisultati, onRisultatiSnapshot,
-  getTuttiPronostici, saveClassifica,
+  getTuttiPronostici, saveClassifica, getClassifica,
   getSistema, updateSistema, onSistemaSnapshot, getClassificaUpdatedAt,
 } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
@@ -32,6 +32,10 @@ let _aperti = true;
 let _built = false;
 let _unsubSistema = null;
 let _activeRound = 'R128';
+let _montepremiCfg = { quota: 0, percentuali: [60, 30, 10] };
+
+// Metodi di pagamento disponibili nel menu a tendina
+const METODI_PAGAMENTO = ['Contanti', 'Bonifico', 'Satispay', 'PayPal', 'Revolut'];
 
 // ── INIT ──────────────────────────────────────────────
 export async function initAdmin() {
@@ -46,10 +50,12 @@ export async function initAdmin() {
   _buildShell();
   _built = true;
 
+  await _caricaConfigMontepremi();
   await _caricaPartecipanti();
   TURNI.forEach(t => _renderRoundRisultati(t.id));
   _renderBonus();
   await _renderSistema();
+  await _renderMontepremi();
 
   if (_unsubSistema) _unsubSistema();
   _unsubSistema = onSistemaSnapshot((cfg) => {
@@ -90,6 +96,7 @@ function _buildShell() {
       <button type="button" class="tab" data-tab="tab-admin-risultati">Risultati</button>
       <button type="button" class="tab" data-tab="tab-admin-bonus">🏆 Bonus</button>
       <button type="button" class="tab" data-tab="tab-admin-partecipanti">Partecipanti</button>
+      <button type="button" class="tab" data-tab="tab-admin-montepremi">💰 Montepremi</button>
       <button type="button" class="tab" data-tab="tab-admin-sistema">Sistema</button>
     </div>
 
@@ -120,6 +127,14 @@ function _buildShell() {
 
     <div id="tab-admin-partecipanti" class="tab-content">
       <div id="admin-partecipanti-container"></div>
+    </div>
+
+    <div id="tab-admin-montepremi" class="tab-content">
+      <div class="info-banner info-banner--yellow">
+        <span>💰</span>
+        <span>Segna chi ha pagato, a chi e con quale metodo. Il montepremi e la ripartizione si aggiornano in automatico.</span>
+      </div>
+      <div id="admin-montepremi-container"></div>
     </div>
 
     <div id="tab-admin-sistema" class="tab-content">
@@ -167,6 +182,13 @@ function _buildShell() {
   // Sistema
   page.querySelector('#btn-toggle-pronostici').addEventListener('click', _togglePronostici);
   page.querySelector('#btn-ricalcola-classifica').addEventListener('click', () => _ricalcola(true));
+
+  // Montepremi: alla riapertura della scheda ricarica la classifica (per i nomi vincitori)
+  const tabMp = page.querySelector('[data-tab="tab-admin-montepremi"]');
+  if (tabMp) tabMp.addEventListener('click', () => setTimeout(async () => {
+    await _caricaClassificaCache();
+    await _renderMontepremi();
+  }, 0));
 }
 
 // ── APPROVAZIONI ──────────────────────────────────────
@@ -482,6 +504,242 @@ async function _togglePronostici() {
   } catch (err) { showToast('Errore: ' + err.message, 'error'); }
 }
 
+// ── MONTEPREMI / PAGAMENTI ────────────────────────────
+let _classificaCache = [];
+
+async function _caricaConfigMontepremi() {
+  try {
+    const cfg = await getSistema();
+    const mp = cfg?.montepremi || {};
+    _montepremiCfg = {
+      quota: Number(mp.quota) || 0,
+      percentuali: Array.isArray(mp.percentuali) && mp.percentuali.length === 3
+        ? mp.percentuali.map(n => Number(n) || 0)
+        : [60, 30, 10],
+    };
+  } catch (_) {
+    _montepremiCfg = { quota: 0, percentuali: [60, 30, 10] };
+  }
+  await _caricaClassificaCache();
+}
+
+async function _caricaClassificaCache() {
+  try { _classificaCache = (await getClassifica()) || []; }
+  catch (_) { _classificaCache = []; }
+}
+
+// Lista admin (per il menu "a chi ha pagato")
+function _incassatori() {
+  return _parts
+    .filter(p => p.isAdmin === true && p.disabilitato !== true)
+    .sort((a, b) => _displayName(a).localeCompare(_displayName(b), 'it'));
+}
+
+// Importo effettivo di un pagamento (default = quota corrente)
+function _importoPagamento(p) {
+  const pag = p.pagamento;
+  if (!pag || pag.pagato !== true) return 0;
+  const imp = Number(pag.importo);
+  return Number.isFinite(imp) && imp > 0 ? imp : _montepremiCfg.quota;
+}
+
+function _fmtEuro(n) {
+  return '€ ' + (Math.round((Number(n) || 0) * 100) / 100).toLocaleString('it-IT',
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Classifica ordinata per montepremi (totale desc, poi spareggio se presente)
+function _classificaOrdinata() {
+  const arr = [..._classificaCache];
+  arr.sort((a, b) => {
+    if ((b.totale || 0) !== (a.totale || 0)) return (b.totale || 0) - (a.totale || 0);
+    const sa = a.spareggio || [], sb = b.spareggio || [];
+    for (let i = 0; i < Math.max(sa.length, sb.length); i++) {
+      const d = (Number(sb[i]) || 0) - (Number(sa[i]) || 0);
+      if (d) return d;
+    }
+    return (a.nome || '').localeCompare(b.nome || '', 'it');
+  });
+  return arr;
+}
+
+async function _renderMontepremi() {
+  const box = document.getElementById('admin-montepremi-container');
+  if (!box) return;
+
+  const approvati = _parts.filter(p => p.approvato === true && p.disabilitato !== true);
+  const paganti = approvati.filter(p => p.pagamento?.pagato === true);
+  const montepremi = paganti.reduce((s, p) => s + _importoPagamento(p), 0);
+  const atteso = _montepremiCfg.quota * approvati.length;
+  const daIncassare = Math.max(0, atteso - montepremi);
+
+  const [p1, p2, p3] = _montepremiCfg.percentuali;
+  const sommaPerc = p1 + p2 + p3;
+  const ord = _classificaOrdinata();
+  const posti = [
+    { etichetta: '🥇 1º', perc: p1, vinc: ord[0] },
+    { etichetta: '🥈 2º', perc: p2, vinc: ord[1] },
+    { etichetta: '🥉 3º', perc: p3, vinc: ord[2] },
+  ];
+
+  const incassatori = _incassatori();
+  const incOpts = (sel) => '<option value="">— a chi —</option>' +
+    incassatori.map(a => `<option value="${a.id}"${sel === a.id ? ' selected' : ''}>${_displayName(a)}</option>`).join('');
+  const metOpts = (sel) => '<option value="">— metodo —</option>' +
+    METODI_PAGAMENTO.map(m => `<option value="${m}"${sel === m ? ' selected' : ''}>${m}</option>`).join('');
+
+  // ── Card impostazioni ──
+  const cfgCard = `
+    <div class="sistema-card mp-config">
+      <h4>⚙️ Impostazioni montepremi</h4>
+      <div class="mp-config-row">
+        <label for="mp-quota">Quota a testa</label>
+        <div class="mp-input-euro"><span>€</span>
+          <input type="number" id="mp-quota" min="0" step="0.5" value="${_montepremiCfg.quota || ''}" placeholder="0">
+        </div>
+      </div>
+      <div class="mp-config-row">
+        <label>Ripartizione premi</label>
+        <div class="mp-perc-inputs">
+          <span class="mp-perc-pos">1º</span><input type="number" class="mp-perc" id="mp-p1" min="0" max="100" value="${p1}">%
+          <span class="mp-perc-pos">2º</span><input type="number" class="mp-perc" id="mp-p2" min="0" max="100" value="${p2}">%
+          <span class="mp-perc-pos">3º</span><input type="number" class="mp-perc" id="mp-p3" min="0" max="100" value="${p3}">%
+          <span class="mp-perc-sum${sommaPerc === 100 ? ' ok' : ' warn'}" id="mp-perc-sum">tot ${sommaPerc}%</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="mp-save-cfg">💾 Salva impostazioni</button>
+    </div>`;
+
+  // ── Riepilogo + distribuzione ──
+  const summaryCard = `
+    <div class="mp-summary">
+      <div class="mp-stat"><span class="mp-stat-val">${paganti.length}/${approvati.length}</span><span class="mp-stat-lbl">Paganti</span></div>
+      <div class="mp-stat mp-stat--accent"><span class="mp-stat-val">${_fmtEuro(montepremi)}</span><span class="mp-stat-lbl">Montepremi</span></div>
+      <div class="mp-stat"><span class="mp-stat-val">${_fmtEuro(daIncassare)}</span><span class="mp-stat-lbl">Ancora da incassare</span></div>
+    </div>
+    <div class="sistema-card mp-distrib">
+      <h4>🏆 Distribuzione premi</h4>
+      ${sommaPerc !== 100 ? '<p class="mp-warn-line">⚠️ Le percentuali non fanno 100%: gli importi sono comunque calcolati sul totale indicato.</p>' : ''}
+      <div class="mp-distrib-list">
+        ${posti.map(p => `
+          <div class="mp-distrib-row">
+            <span class="mp-distrib-pos">${p.etichetta}</span>
+            <span class="mp-distrib-perc">${p.perc}%</span>
+            <span class="mp-distrib-amt">${_fmtEuro(montepremi * p.perc / 100)}</span>
+            <span class="mp-distrib-name">${p.vinc ? p.vinc.nome : '<em class="text-muted">da definire</em>'}</span>
+          </div>`).join('')}
+      </div>
+      ${_classificaCache.length ? '' : '<p class="text-muted mp-distrib-note">La classifica non è ancora stata calcolata: i nomi dei vincitori compaiono dopo il primo ricalcolo.</p>'}
+    </div>`;
+
+  // ── Tabella pagamenti ──
+  let rows;
+  if (!approvati.length) {
+    rows = `<div class="empty-state"><div class="empty-icon">👥</div><p>Nessun partecipante approvato.</p></div>`;
+  } else {
+    const sorted = [...approvati].sort((a, b) => _displayName(a).localeCompare(_displayName(b), 'it'));
+    rows = `<div class="mp-pay-list">` + sorted.map(p => {
+      const pag = p.pagamento || {};
+      const pagato = pag.pagato === true;
+      const imp = pagato ? (pag.importo ?? _montepremiCfg.quota) : '';
+      return `
+      <div class="mp-pay-row${pagato ? ' mp-pay-row--ok' : ''}" data-uid="${p.id}">
+        <label class="mp-pay-check">
+          <input type="checkbox" data-mp-pagato="${p.id}" ${pagato ? 'checked' : ''}>
+          <span class="mp-pay-name">${_displayName(p)}</span>
+        </label>
+        <div class="mp-input-euro mp-pay-importo">
+          <span>€</span>
+          <input type="number" min="0" step="0.5" data-mp-importo="${p.id}" value="${imp}" ${pagato ? '' : 'disabled'} placeholder="${_montepremiCfg.quota || 0}">
+        </div>
+        <select class="mp-pay-select" data-mp-incassato="${p.id}" ${pagato ? '' : 'disabled'}>${incOpts(pag.incassatoDa || '')}</select>
+        <select class="mp-pay-select" data-mp-metodo="${p.id}" ${pagato ? '' : 'disabled'}>${metOpts(pag.metodo || '')}</select>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  box.innerHTML = `
+    ${cfgCard}
+    ${summaryCard}
+    <div class="mp-pay">
+      <div class="round-head"><h4 class="section-title">Pagamenti</h4>
+        <span class="round-progress">${paganti.length}/${approvati.length} pagati</span></div>
+      ${rows}
+    </div>`;
+
+  // Listener impostazioni
+  box.querySelector('#mp-save-cfg')?.addEventListener('click', (e) => _salvaConfigMontepremi(e.target));
+  ['mp-p1', 'mp-p2', 'mp-p3'].forEach(id => {
+    box.querySelector('#' + id)?.addEventListener('input', () => {
+      const s = (Number(box.querySelector('#mp-p1').value) || 0)
+        + (Number(box.querySelector('#mp-p2').value) || 0)
+        + (Number(box.querySelector('#mp-p3').value) || 0);
+      const el = box.querySelector('#mp-perc-sum');
+      if (el) { el.textContent = 'tot ' + s + '%'; el.className = 'mp-perc-sum ' + (s === 100 ? 'ok' : 'warn'); }
+    });
+  });
+
+  // Listener pagamenti
+  box.querySelectorAll('[data-mp-pagato]').forEach(c =>
+    c.addEventListener('change', () => _setPagato(c.dataset.mpPagato, c.checked)));
+  box.querySelectorAll('[data-mp-importo]').forEach(i =>
+    i.addEventListener('change', () => _setPagamentoCampo(i.dataset.mpImporto, 'importo', Number(i.value) || 0)));
+  box.querySelectorAll('[data-mp-incassato]').forEach(s =>
+    s.addEventListener('change', () => _setPagamentoCampo(s.dataset.mpIncassato, 'incassatoDa', s.value || '')));
+  box.querySelectorAll('[data-mp-metodo]').forEach(s =>
+    s.addEventListener('change', () => _setPagamentoCampo(s.dataset.mpMetodo, 'metodo', s.value || '')));
+}
+
+async function _salvaConfigMontepremi(btn) {
+  const quota = Number(document.getElementById('mp-quota')?.value) || 0;
+  const p1 = Number(document.getElementById('mp-p1')?.value) || 0;
+  const p2 = Number(document.getElementById('mp-p2')?.value) || 0;
+  const p3 = Number(document.getElementById('mp-p3')?.value) || 0;
+  if (quota < 0) { showToast('La quota non può essere negativa.', 'error'); return; }
+  const old = btn.textContent; btn.disabled = true; btn.textContent = '⏳ Salvataggio…';
+  try {
+    _montepremiCfg = { quota, percentuali: [p1, p2, p3] };
+    await updateSistema({ montepremi: _montepremiCfg });
+    showToast('Impostazioni montepremi salvate.', 'success');
+    await _renderMontepremi();
+  } catch (err) {
+    showToast('Errore: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
+async function _setPagato(uid, pagato) {
+  const p = _parts.find(x => x.id === uid); if (!p) return;
+  const prev = p.pagamento || {};
+  const pagamento = pagato
+    ? { pagato: true,
+        importo: (prev.importo ?? _montepremiCfg.quota),
+        incassatoDa: prev.incassatoDa || '',
+        metodo: prev.metodo || '',
+        data: prev.data || new Date().toISOString() }
+    : { ...prev, pagato: false };
+  try {
+    await setPagamento(uid, pagamento);
+    p.pagamento = pagamento;
+    showToast(pagato ? 'Pagamento registrato.' : 'Pagamento annullato.', pagato ? 'success' : 'info');
+    await _renderMontepremi();
+  } catch (err) { showToast('Errore: ' + err.message, 'error'); }
+}
+
+async function _setPagamentoCampo(uid, campo, valore) {
+  const p = _parts.find(x => x.id === uid); if (!p) return;
+  const pagamento = { ...(p.pagamento || { pagato: true }), [campo]: valore };
+  if (pagamento.pagato !== true) pagamento.pagato = true;
+  if (!pagamento.data) pagamento.data = new Date().toISOString();
+  try {
+    await setPagamento(uid, pagamento);
+    p.pagamento = pagamento;
+    // Re-render solo se l'importo cambia il totale (per aggiornare riepilogo/distribuzione)
+    if (campo === 'importo') await _renderMontepremi();
+  } catch (err) { showToast('Errore: ' + err.message, 'error'); }
+}
+
 // ── RICALCOLO CLASSIFICA (client-side) ────────────────
 async function _ricalcola(manuale) {
   const btn = document.getElementById('btn-ricalcola-classifica');
@@ -515,6 +773,8 @@ async function _ricalcola(manuale) {
     });
 
     await saveClassifica(out);
+    _classificaCache = out;              // aggiorna i nomi nella distribuzione premi
+    if (document.getElementById('admin-montepremi-container')) await _renderMontepremi();
     showToast(`Classifica ricalcolata (${out.length} partecipanti).`, 'success');
     const el = document.getElementById('sistema-classifica-status');
     if (el) el.textContent = `Ultimo aggiornamento: ${formatDate(new Date().toISOString(), true)}`;

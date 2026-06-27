@@ -1,5 +1,5 @@
 /**
- * MONDIALITO 2026 — db.js
+ * WIMBLEDINO — db.js
  * Astrazione Firestore: tutte le operazioni di lettura/scrittura
  * passano da qui, così il resto del codice non tocca mai Firestore direttamente.
  */
@@ -147,6 +147,16 @@ export async function updatePartecipante(uid, patch) {
   await updateDoc(doc(db(), 'partecipanti', uid), patch);
 }
 
+/**
+ * Salva lo stato di pagamento di un partecipante (solo admin).
+ * Scrive l'intero oggetto `pagamento` nel documento del partecipante.
+ * @param {string} uid
+ * @param {Object|null} pagamento  { pagato, importo, incassatoDa, metodo, data }
+ */
+export async function setPagamento(uid, pagamento) {
+  await updateDoc(doc(db(), 'partecipanti', uid), { pagamento: pagamento || null });
+}
+
 // ── SISTEMA ───────────────────────────────────────────
 
 /**
@@ -173,31 +183,3 @@ export function onSistemaSnapshot(callback) {
   });
 }
 
-// ── LIVE / PARTITE ────────────────────────────────────
-
-/**
- * Carica i dati live (partite in corso / oggi / prossime).
- * @returns {Object}
- */
-export async function getLive() {
-  const snap = await getDoc(doc(db(), 'live', 'oggi'));
-  return snap.exists() ? snap.data() : {};
-}
-
-/**
- * Ascolta i dati live in real-time.
- */
-export function onLiveSnapshot(callback) {
-  return onSnapshot(doc(db(), 'live', 'oggi'), (snap) => {
-    callback(snap.exists() ? snap.data() : {});
-  });
-}
-
-/**
- * Ascolta la classifica marcatori in real-time.
- */
-export function onMarcatoriSnapshot(callback) {
-  return onSnapshot(doc(db(), 'live', 'marcatori'), (snap) => {
-    callback(snap.exists() ? (snap.data().lista || []) : []);
-  });
-}
