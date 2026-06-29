@@ -1,5 +1,5 @@
 /**
- * MONDIALITO 2026 — classifica.js
+ * WIMBLEDINO — classifica.js
  * Leaderboard real-time con calcolo spareggio.
  * La classifica pre-calcolata è in Firestore (aggiornata dalla Cloud Function).
  */
@@ -133,6 +133,9 @@ export function renderClassifica(partecipanti) {
 
 // ── PROFILO SCORE CARD ────────────────────────────────
 function _aggiornaProfilo(sorted) {
+  // Non toccare la score-card quando l'utente sta guardando il profilo di un altro
+  // partecipante: in quel caso è profilo.js a gestirla.
+  if (STATE.profiloUid) return;
   const me = sorted.find(p => p.id === STATE.utente?.id);
   const card = document.getElementById('profilo-score-card');
   if (!card || !me) return;
