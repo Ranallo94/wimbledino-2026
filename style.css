@@ -2609,6 +2609,50 @@ select.field-input option { background: var(--bg-card2); }
   .prof-bd-table thead th, .prof-bd-row td { padding: 6px 5px; }
 }
 
+/* Riepilogo — riga totali */
+.prof-bd-table tfoot td { padding: 8px; border-top: 2px solid var(--border); font-weight: 800; }
+.prof-bd-totrow td:first-child { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: .04em; }
+.prof-bd-totrow .prof-bd-num { color: var(--oro); }
+
+/* Tabellone — scelta indovinata (override di .bk-win) */
+.bk-slot.bk-correct { background: var(--verde-light); color: #fff; box-shadow: inset 0 0 0 2px var(--oro); font-weight: 800; }
+
+/* Tabellone — legenda */
+.prof-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12px; color: var(--text-muted); }
+.prof-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.prof-legend-sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid var(--border); }
+.prof-legend-sw--pick { background: var(--verde); }
+.prof-legend-sw--ok { background: var(--verde-light); box-shadow: inset 0 0 0 2px var(--oro); }
+
+/* Tabellone — bonus con esito */
+.prof-bonus-title { font-size: 14px; font-weight: 800; margin: 0 0 10px; }
+.prof-bonus-list { display: flex; flex-direction: column; gap: 8px; }
+.prof-bonus-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.prof-bonus-row:last-child { border-bottom: none; }
+.prof-bonus-label { color: var(--text-muted); }
+.prof-bonus-val { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+
+/* Risultati — selettore turni */
+.prof-round-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; -webkit-overflow-scrolling: touch; }
+.prof-round-btn { flex: 0 0 auto; background: var(--bg-card2); color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer; transition: var(--transition); white-space: nowrap; }
+.prof-round-btn:hover { color: var(--text); }
+.prof-round-btn.active { background: var(--verde); color: #fff; border-color: var(--verde-light); }
+
+/* Risultati — intestazione turno */
+.prof-res-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.prof-res-head .prof-card-title { margin: 0; }
+.prof-res-sum { font-size: 12.5px; color: var(--text-muted); }
+.prof-res-sum strong { color: var(--oro); }
+
+/* Risultati — card partita (riusa .round-matches .match-card) */
+.round-matches .match-card.prof-res-hit { box-shadow: inset 3px 0 0 var(--verde-light); }
+.prof-res-status { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.prof-pts { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border); }
+.prof-pts--ok   { background: var(--verde-dark); border-color: var(--verde); color: #dff5e6; }
+.prof-pts--set  { background: var(--oro-pale); border-color: var(--oro-dark); color: var(--text-dark); }
+.prof-pts--miss { color: var(--text-muted); }
+.prof-pts--no   { color: var(--rosso); border-color: rgba(229,62,62,.4); }
+
 /* ════════════════════════════════════════════════════════════════
    WIMBLEDINO — Pagina RISULTATI (read-only, live)
    ════════════════════════════════════════════════════════════════ */

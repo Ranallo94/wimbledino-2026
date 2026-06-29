@@ -195,121 +195,12 @@
 
       <!-- ── PAGINA: RISULTATI ── -->
       <div id="page-live" class="page">
-        <div class="page-header">
-          <h2 class="page-title">📊 Risultati</h2>
-          <span id="live-updated" class="page-subtitle"></span>
-        </div>
-
-        <!-- Tab interni -->
-        <div class="inner-tabs" id="live-inner-tabs">
-          <button class="tab active" data-tab="tab-live-risultati">Partite</button>
-          <button class="tab" data-tab="tab-live-marcatori">⚽ Marcatori</button>
-        </div>
-
-        <!-- TAB: Partite -->
-        <div id="tab-live-risultati" class="tab-content active">
-          <!-- Partite in corso (solo se ci sono) -->
-          <div id="live-in-corso" class="section-block" style="display:none">
-            <h3 class="section-title section-title-live">🔴 In corso</h3>
-            <div id="live-partite-incorso"></div>
-          </div>
-
-          <!-- Partite oggi non ancora iniziate -->
-          <div id="live-oggi" class="section-block" style="display:none">
-            <h3 class="section-title">⏰ Oggi</h3>
-            <div id="live-partite-oggi"></div>
-          </div>
-
-          <!-- Risultati per girone -->
-          <div id="live-gironi" class="section-block">
-            <h3 class="section-title">📋 Risultati per girone</h3>
-            <div id="live-gironi-container">
-              <div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>
-            </div>
-          </div>
-
-          <!-- Prossime partite -->
-          <div id="live-prossime" class="section-block" style="display:none">
-            <h3 class="section-title">📅 Prossime partite</h3>
-            <div id="live-partite-prossime"></div>
-          </div>
-        </div>
-
-        <!-- TAB: Marcatori -->
-        <div id="tab-live-marcatori" class="tab-content">
-          <div id="live-marcatori-container">
-            <div class="loading-state"><div class="spinner"></div><p>Caricamento marcatori…</p></div>
-          </div>
-        </div>
+        <!-- Contenuto generato da live.js -->
       </div>
 
       <!-- ── PAGINA: PRONOSTICI ── -->
       <div id="page-pronostici" class="page">
-        <div class="page-header">
-          <h2 class="page-title">📋 La mia scheda pronostici</h2>
-          <span id="pronostici-status" class="page-subtitle"></span>
-        </div>
-
-        <!-- Banner torneo aperto/chiuso -->
-        <div id="pronostici-banner" class="info-banner" style="display:none"></div>
-
-        <!-- Tabs sezioni -->
-        <div class="tab-bar" id="pronostici-tabs">
-          <button class="tab active" data-tab="tab-gironi">Gironi</button>
-          <button class="tab" data-tab="tab-riepilogo">Riepilogo</button>
-          <button class="tab" data-tab="tab-eliminatoria">Eliminatoria</button>
-          <button class="tab" data-tab="tab-tabellone">Tabellone</button>
-          <button class="tab" data-tab="tab-speciali">Marcatori</button>
-        </div>
-
-        <form id="form-pronostici">
-
-          <!-- TAB: Gironi -->
-          <div id="tab-gironi" class="tab-content active">
-            <div id="gironi-container">
-              <!-- Generato da pronostici.js -->
-            </div>
-          </div>
-
-          <!-- TAB: Riepilogo gironi -->
-          <div id="tab-riepilogo" class="tab-content">
-            <div id="riepilogo-container">
-              <!-- Generato da pronostici.js -->
-            </div>
-          </div>
-
-          <!-- TAB: Fase eliminatoria -->
-          <div id="tab-eliminatoria" class="tab-content">
-            <div class="info-banner info-banner--blue">
-              <span>📌</span>
-              <span>Pronostica le squadre che raggiungeranno ogni turno. Per ogni partita indica anche la modalità di passaggio del turno: 90 min, supplementari o rigori.</span>
-            </div>
-            <div id="eliminatoria-container">
-              <!-- Generato da pronostici.js -->
-            </div>
-          </div>
-
-          <!-- TAB: Tabellone -->
-          <div id="tab-tabellone" class="tab-content">
-            <div id="tabellone-container">
-              <!-- Generato da pronostici.js -->
-            </div>
-          </div>
-
-          <!-- TAB: Speciali -->
-          <div id="tab-speciali" class="tab-content">
-            <div id="speciali-container">
-              <!-- Capocannonieri + posizioni girone -->
-            </div>
-            <div class="elim-save-row" style="margin-top:16px">
-              <button type="button" id="btn-salva-marcatori" class="btn-salva-fase">
-                💾 Salva Marcatori
-              </button>
-              <span class="elim-save-msg" id="esm-marcatori"></span>
-            </div>
-          </div>
-
-        </form>
+        <!-- Contenuto generato da pronostici.js -->
       </div>
 
       <!-- ── PAGINA: PROFILO ── -->
@@ -323,22 +214,28 @@
 
         <div id="profilo-score-card" class="score-card"></div>
 
-        <!-- Tab interni: Riepilogo / Scheda pronostici -->
+        <!-- Tab interni: Riepilogo / Tabellone / Risultati -->
         <div class="inner-tabs" id="profilo-inner-tabs">
           <button class="tab active" data-tab="tab-profilo-riepilogo">Riepilogo</button>
-          <button class="tab" data-tab="tab-profilo-scheda">Scheda pronostici</button>
+          <button class="tab" data-tab="tab-profilo-tabellone">Tabellone</button>
+          <button class="tab" data-tab="tab-profilo-risultati">Risultati</button>
         </div>
 
-        <!-- TAB: Riepilogo (breakdown + partite girone) -->
+        <!-- TAB: Riepilogo (punti per turno: esiti + set) -->
         <div id="tab-profilo-riepilogo" class="tab-content active">
           <div id="profilo-breakdown"></div>
-          <div id="profilo-imminenti"></div>
-          <div id="profilo-partite"></div>
         </div>
 
-        <!-- TAB: Scheda pronostici completa -->
-        <div id="tab-profilo-scheda" class="tab-content">
-          <div id="profilo-scheda-container">
+        <!-- TAB: Tabellone pronosticato (giocatori indovinati evidenziati) -->
+        <div id="tab-profilo-tabellone" class="tab-content">
+          <div id="profilo-tabellone-container">
+            <div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>
+          </div>
+        </div>
+
+        <!-- TAB: Risultati ufficiali turno per turno (esiti/set indovinati evidenziati) -->
+        <div id="tab-profilo-risultati" class="tab-content">
+          <div id="profilo-risultati-container">
             <div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>
           </div>
         </div>
@@ -347,91 +244,7 @@
 
       <!-- ── PAGINA: ADMIN ── -->
       <div id="page-admin" class="page">
-        <div class="page-header">
-          <h2 class="page-title">⚙️ Pannello Admin</h2>
-          <span class="page-subtitle">Verifica e correggi i risultati automatici</span>
-        </div>
-
-        <div class="admin-tabs tab-bar">
-          <button class="tab active" data-tab="tab-admin-approvazioni">
-            Approvazioni <span id="approv-badge" class="nav-badge" style="display:none;position:relative;top:-1px;right:auto;margin-left:4px"></span>
-          </button>
-          <button class="tab" data-tab="tab-admin-risultati">Risultati</button>
-          <button class="tab" data-tab="tab-admin-marcatori">⚽ Marcatori</button>
-          <button class="tab" data-tab="tab-admin-partecipanti">Partecipanti</button>
-          <button class="tab" data-tab="tab-admin-sistema">Sistema</button>
-        </div>
-
-        <div id="tab-admin-approvazioni" class="tab-content active">
-          <div id="admin-approvazioni-container">
-            <!-- Generato da admin.js -->
-          </div>
-        </div>
-
-        <div id="tab-admin-risultati" class="tab-content">
-          <div class="info-banner info-banner--yellow">
-            <span>🤖</span>
-            <span>I risultati vengono aggiornati automaticamente da football-data.org. Usa questo pannello solo per correzioni manuali.</span>
-          </div>
-          <div id="admin-risultati-container">
-            <!-- Generato da admin.js -->
-          </div>
-        </div>
-
-        <div id="tab-admin-marcatori" class="tab-content">
-          <div class="info-banner info-banner--yellow">
-            <span>⚽</span>
-            <span>Inserisci o aggiorna la classifica marcatori. Premendo "Aggiorna Marcatori" i dati compaiono subito nel tab Risultati › Marcatori.</span>
-          </div>
-          <div id="admin-marcatori-container">
-            <!-- Generato da admin.js -->
-          </div>
-        </div>
-
-        <div id="tab-admin-partecipanti" class="tab-content">
-          <div id="admin-partecipanti-container">
-            <!-- Lista partecipanti e loro stato pronostici -->
-          </div>
-        </div>
-
-        <div id="tab-admin-sistema" class="tab-content">
-          <div class="admin-sistema-grid">
-            <div class="sistema-card">
-              <h4>🔄 Sync manuale</h4>
-              <p>Forza l'aggiornamento immediato dei risultati dall'API.</p>
-              <button id="btn-sync-now" class="btn btn-secondary">Sincronizza ora</button>
-            </div>
-            <div class="sistema-card">
-              <h4>🔒 Pronostici</h4>
-              <p id="sistema-pronostici-status">—</p>
-              <button id="btn-toggle-pronostici" class="btn btn-secondary">Apri / Chiudi</button>
-            </div>
-            <div class="sistema-card">
-              <h4>📡 Stato API</h4>
-              <p id="sistema-api-status">—</p>
-              <button id="btn-check-api" class="btn btn-secondary">Verifica</button>
-            </div>
-            <div class="sistema-card">
-              <h4>🏅 Classifica</h4>
-              <p id="sistema-classifica-status">—</p>
-              <button id="btn-ricalcola-classifica" class="btn btn-primary">Ricalcola classifica</button>
-            </div>
-          </div>
-
-          <!-- Spareggio migliori terze -->
-          <div class="sistema-card sistema-card--full">
-            <h4>🏅 Spareggio migliori terze</h4>
-            <p>Riordina manualmente le 12 terze classificate in caso di parità non risolvibile con i criteri automatici (pt → GD → GF). L'ordine salvato viene usato per il calcolo dei punteggi. Le righe <span class="sp-tied-label">evidenziate</span> sono in parità perfetta.</p>
-            <div id="spareggio-terze-container">
-              <p class="text-muted">Caricamento…</p>
-            </div>
-            <div class="spareggio-save-row">
-              <button type="button" id="btn-salva-spareggio" class="btn btn-primary">💾 Salva ordine</button>
-              <span id="spareggio-save-msg"></span>
-            </div>
-          </div>
-
-        </div>
+        <!-- Contenuto generato da admin.js -->
       </div>
 
       <!-- ── PAGINA: REGOLAMENTO ── -->
@@ -530,24 +343,28 @@
           <h3 class="reg-section-title">🏆 Premi</h3>
           <div class="info-banner info-banner--yellow">
             <span>📢</span>
-            <span>I premi verranno stabiliti in base al numero definitivo di partecipanti e annunciati il giorno successivo all'inizio del torneo.</span>
+            <span>Il montepremi viene stabilito in base al numero definitivo di partecipanti e annunciato il giorno successivo all'inizio del torneo. La sua ripartizione è la seguente:</span>
           </div>
           <div class="reg-premi-grid">
             <div class="reg-premio">
               <span class="reg-premio-icon">🥇</span>
               <span class="reg-premio-label">1° classificato</span>
+              <span class="reg-premio-perc">60%</span>
             </div>
             <div class="reg-premio">
               <span class="reg-premio-icon">🥈</span>
               <span class="reg-premio-label">2° classificato</span>
+              <span class="reg-premio-perc">30%</span>
             </div>
             <div class="reg-premio">
               <span class="reg-premio-icon">🥉</span>
               <span class="reg-premio-label">3° classificato</span>
+              <span class="reg-premio-perc">10%</span>
             </div>
             <div class="reg-premio">
               <span class="reg-premio-icon">🪣</span>
               <span class="reg-premio-label">Ultimo classificato</span>
+              <span class="reg-premio-perc reg-premio-perc--none">—</span>
             </div>
           </div>
         </div>
