@@ -3,10 +3,12 @@
  * Pagina "Il mio profilo" (e scheda di un altro partecipante, via STATE.profiloUid).
  *
  * Tre sotto-schede:
- *   • Riepilogo  — punti per turno: Esiti e Set, con i totali.
- *   • Tabellone  — tabellone grafico pronosticato, con i giocatori indovinati
- *                  (scelte che hanno davvero vinto in quel turno) evidenziati,
- *                  più i bonus di fine torneo con esito.
+ *   • Riepilogo  — punti per turno (Esiti e Set, con i totali) + i pronostici
+ *                  chiave: campione, finalisti, semifinalisti e i tre bonus, con
+ *                  stato live rispetto ai risultati (raggiunto / in corsa / fuori).
+ *   • Tabellone  — tabellone grafico pronosticato: viene evidenziato in verde
+ *                  solo il pronostico indovinato (il resto del percorso si legge
+ *                  già dalla struttura).
  *   • Risultati  — risultati ufficiali turno per turno: per ogni partita conclusa
  *                  è evidenziato se hai azzeccato l'esito e se hai indovinato il set.
  *
@@ -20,7 +22,7 @@ import { STATE, navigaA } from './app.js';
 import { getClassifica, getPronostici, getRisultati, getSistema } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
-  TURNI, getPron, getMatchPlayers, matchId, renderBracketGrafico,
+  TURNI, getCampione, getPron, getMatchPlayers, matchId, renderBracketGrafico,
 } from './bracket.js';
 import { WINNER_POINTS, SET_POINTS, calcolaPunteggio } from './punteggi.js';
 import { rankBadge, infoBtn, openSchedaGiocatore } from './giocatore.js';
@@ -69,15 +71,27 @@ export async function initProfilo() {
 
     // Mappe vincitori/set per turno: scelte utente e risultati reali.
     const userPicks = {}, realPicks = {}, realWinnersByRound = {};
+    const eliminati = new Set();
     TURNI.forEach(t => {
       userPicks[t.id] = _vincitoriMap(pron, t.id);
       realPicks[t.id] = _vincitoriMap(risultati, t.id);
       realWinnersByRound[t.id] = new Set(Object.keys(realPicks[t.id]));
+      // Sconfitti reali del turno (per lo stato "eliminato" dei pronostici chiave).
+      for (let i = 0; i < t.matches; i++) {
+        const p = getPron(risultati, t.id, matchId(t.id, i));
+        if (!p?.vincitore) continue;
+        const { a, b } = getMatchPlayers(t.id, i, risultati, db);
+        if (p.vincitore !== a && p.vincitore !== b) continue;
+        const perdente = p.vincitore === a ? b : a;
+        if (perdente) eliminati.add(perdente);
+      }
     });
+    const stato = { winnersByRound: realWinnersByRound, eliminati };
 
     _renderScoreCard(me, nome, isMe, classifica);
     _renderBreakdown(me, pron, risultati, db);
-    _renderTabellone(pron, risultati, db, realWinnersByRound, puoVedere);
+    _renderKeyPicks(pron, risultati, db, stato, puoVedere);
+    _renderTabellone(pron, db, realWinnersByRound, puoVedere);
     _renderRisultati(pron, risultati, db, userPicks, realPicks, puoVedere);
   } catch (err) {
     if (bd) bd.innerHTML =
@@ -186,22 +200,91 @@ function _renderBreakdown(me, pron, risultati, db) {
     </div>`;
 }
 
-// ── TABELLONE: bracket con indovinati evidenziati ─────
-function _renderTabellone(pron, risultati, db, realWinnersByRound, puoVedere) {
+// ── RIEPILOGO: pronostici chiave (campione/finalisti/SF + bonus) ─
+function _renderKeyPicks(pron, risultati, db, stato, puoVedere) {
+  const box = document.getElementById('profilo-keypicks');
+  if (!box) return;
+
+  if (!puoVedere) {
+    box.innerHTML = `
+      <div class="prof-card prof-card--locked">
+        <h3 class="prof-card-title">🙈 Pronostici nascosti</h3>
+        <p class="text-muted">Le scelte di questo partecipante sono nascoste finché i pronostici sono aperti.</p>
+      </div>`;
+    return;
+  }
+
+  const campione = getCampione(pron);
+  const finalisti = Object.keys(_vincitoriMap(pron, 'SF'));
+  const semifinalisti = Object.keys(_vincitoriMap(pron, 'QF'));
+
+  const champHtml = campione
+    ? _chipGiocatore(db, campione, _statoPick(campione, 'F', stato))
+    : '<span class="text-muted">— non pronosticato</span>';
+
+  box.innerHTML = `
+    <div class="prof-card">
+      <h3 class="prof-card-title">🎯 I tuoi pronostici chiave</h3>
+      <div class="prof-keys">
+        <div class="prof-key-group">
+          <div class="prof-key-label">🏆 Campione</div>
+          <div class="prof-chips">${champHtml}</div>
+        </div>
+        <div class="prof-key-group">
+          <div class="prof-key-label">🥈 Finalisti</div>
+          <div class="prof-chips">${_chipList(db, finalisti, 'SF', stato)}</div>
+        </div>
+        <div class="prof-key-group">
+          <div class="prof-key-label">🎽 Semifinalisti</div>
+          <div class="prof-chips">${_chipList(db, semifinalisti, 'QF', stato)}</div>
+        </div>
+      </div>
+      <div id="profilo-keypicks-bonus"></div>
+      <p class="prof-note">✅ raggiunto · ⏳ ancora in corsa · ❌ eliminato — rispetto ai risultati ufficiali.</p>
+    </div>`;
+
+  _renderBonusConfronto(document.getElementById('profilo-keypicks-bonus'), pron, risultati, db);
+
+  box.querySelectorAll('.player-info-btn[data-info]').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openSchedaGiocatore(db, btn.dataset.info); });
+  });
+}
+
+function _chipList(db, pids, round, stato) {
+  if (!pids.length) return '<span class="text-muted">— non pronosticati</span>';
+  return pids.map(pid => _chipGiocatore(db, pid, _statoPick(pid, round, stato))).join('');
+}
+
+function _chipGiocatore(db, pid, st) {
+  const icon = st === 'ok' ? '✅' : st === 'out' ? '❌' : '⏳';
+  const cls = st === 'ok' ? ' prof-chip--ok' : st === 'out' ? ' prof-chip--out' : ' prof-chip--live';
+  return `<span class="prof-chip${cls}">
+    <span class="prof-chip-ic">${icon}</span>
+    <span class="prof-chip-name">${nomeGiocatore(db, pid)}</span>${rankBadge(db, pid)}
+    ${infoBtn(pid)}
+  </span>`;
+}
+
+/** Stato di un pronostico chiave: 'ok' (raggiunto), 'out' (eliminato), 'live'. */
+function _statoPick(pid, round, stato) {
+  if (stato.winnersByRound[round]?.has(pid)) return 'ok';
+  if (stato.eliminati.has(pid)) return 'out';
+  return 'live';
+}
+
+// ── TABELLONE: bracket con i soli indovinati evidenziati ──
+function _renderTabellone(pron, db, realWinnersByRound, puoVedere) {
   const box = document.getElementById('profilo-tabellone-container');
   if (!box) return;
   if (!puoVedere) { box.innerHTML = _hiddenMsg(); return; }
 
   box.innerHTML = `
     <div class="prof-legend">
-      <span class="prof-legend-item"><span class="prof-legend-sw prof-legend-sw--pick"></span> la tua scelta</span>
-      <span class="prof-legend-item"><span class="prof-legend-sw prof-legend-sw--ok"></span> indovinato</span>
+      <span class="prof-legend-item"><span class="prof-legend-sw prof-legend-sw--ok"></span> pronostico indovinato</span>
     </div>
-    <div class="prof-card"><div id="profilo-bracket-grafico"></div></div>
-    <div class="prof-card"><div id="profilo-bonus-box"></div></div>`;
+    <div class="prof-card prof-bracket"><div id="profilo-bracket-grafico"></div></div>`;
 
   renderBracketGrafico(document.getElementById('profilo-bracket-grafico'), pron, db, realWinnersByRound);
-  _renderBonusConfronto(document.getElementById('profilo-bonus-box'), pron, risultati, db);
 }
 
 function _renderBonusConfronto(container, pron, risultati, db) {
