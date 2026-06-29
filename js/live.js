@@ -154,15 +154,15 @@ function _renderRound(roundId) {
       continue;
     }
 
+    // Giocatore in sola lettura: testo statico (non un pulsante). L'unico
+    // elemento interattivo è la ⓘ che apre la scheda giocatore.
     const side = (pid) => {
       if (!pid) {
-        return `<div class="match-side">
-          <span class="match-team match-team--ro match-team--empty">—</span></div>`;
+        return `<div class="match-side"><span class="ris-player ris-player--empty">—</span></div>`;
       }
       const isWin  = vinc === pid;
       const isLose = vinc && !isWin;
-      const cls = 'match-team match-team--ro' +
-        (isWin ? ' selected' : '') + (isLose ? ' match-team--lose' : '');
+      const cls = 'ris-player' + (isWin ? ' ris-player--win' : '') + (isLose ? ' ris-player--lose' : '');
       return `<div class="match-side">
         <span class="${cls}">
           <span class="mt-name">${isWin ? '🏆 ' : ''}${nomeGiocatore(_db, pid)}</span>${rankBadge(_db, pid)}
@@ -171,11 +171,11 @@ function _renderRound(roundId) {
       </div>`;
     };
 
-    // Slot del set: pillola dorata col punteggio se concluso, altrimenti stato.
+    // Slot del set: punteggio statico (non un selettore), altrimenti stato.
     let setSlot;
     if (vinc) {
       setSlot = p.set
-        ? `<span class="match-set-label">set</span><span class="set-opt selected">${p.set}</span>`
+        ? `<span class="ris-set-label">set</span><span class="ris-set-score">${p.set}</span>`
         : `<span class="ris-pending">concluso</span>`;
     } else {
       setSlot = `<span class="ris-pending">in programma</span>`;
