@@ -2632,13 +2632,29 @@ select.field-input option { background: var(--bg-card2); }
   100% { box-shadow: 0 0 0 0 rgba(229,62,62,0); }
 }
 
-/* Giocatore read-only (non è un pulsante): niente cursore/hover */
-.round-matches .match-team--ro { cursor: default; }
-.round-matches .match-team--ro:hover { border-color: var(--border); }
-.round-matches .match-side .match-team--ro.selected:hover { border-color: var(--verde-light); }
+/* Giocatore in sola lettura: testo statico, NON un pulsante.
+   Nessuno sfondo/bordo/hover/cursore → non sembra toccabile. */
+.round-matches .match-side .ris-player {
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+  padding: 9px 2px; font-size: 14px; font-weight: 600; color: var(--text);
+  background: none; border: none; cursor: default;
+}
+.round-matches .ris-player .mt-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.round-matches .ris-player--win  { color: var(--verde-light); font-weight: 800; }
+.round-matches .ris-player--lose { color: var(--text-muted); opacity: .65; }
+.round-matches .ris-player--empty { color: var(--text-muted); }
 
-/* Sconfitto: leggermente attenuato */
-.round-matches .match-team--lose { opacity: .58; }
+/* Punteggio set in sola lettura: testo statico, niente look "pillola". */
+.round-matches .match-set .ris-set-label {
+  font-size: 11px; text-transform: uppercase; color: var(--text-muted);
+}
+.round-matches .match-set .ris-set-score {
+  font-size: 14px; font-weight: 800; color: var(--oro);
+  font-variant-numeric: tabular-nums; letter-spacing: .5px;
+}
 
 /* Etichetta di stato nello slot del set (es. "in programma") */
 .ris-pending {
