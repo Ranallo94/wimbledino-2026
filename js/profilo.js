@@ -2,34 +2,30 @@
  * WIMBLEDINO — profilo.js
  * Pagina "Il mio profilo" (e scheda di un altro partecipante, via STATE.profiloUid).
  *
- * Contiene:
- *   • Score card: posizione in classifica + punti totali.
- *   • Tab "Riepilogo":
- *       – Punti per turno (breakdown esiti/set + giocatori indovinati).
- *       – Pronostici chiave (campione, finalisti, semifinalisti) con stato live
- *         confrontato coi risultati ufficiali (confermato / in corsa / fuori).
- *       – Prossime partite dei giocatori pronosticati (calendario live ESPN).
- *   • Tab "Scheda pronostici": tabellone grafico completo + bonus fine torneo.
+ * Tre sotto-schede:
+ *   • Riepilogo  — punti per turno: Esiti e Set, con i totali.
+ *   • Tabellone  — tabellone grafico pronosticato, con i giocatori indovinati
+ *                  (scelte che hanno davvero vinto in quel turno) evidenziati,
+ *                  più i bonus di fine torneo con esito.
+ *   • Risultati  — risultati ufficiali turno per turno: per ogni partita conclusa
+ *                  è evidenziato se hai azzeccato l'esito e se hai indovinato il set.
  *
- * Privacy: la scheda/i pronostici di un ALTRO partecipante restano nascosti se
- * lui ha attivato "nascondi pronostico" e i pronostici sono ancora aperti
- * (gli admin e il proprietario vedono comunque tutto).
+ * Privacy: Tabellone e Risultati di un ALTRO partecipante restano nascosti se lui
+ * ha attivato "nascondi pronostico" e i pronostici sono ancora aperti (admin e
+ * proprietario vedono comunque tutto). Il Riepilogo usa solo punti aggregati
+ * (pubblici via classifica) e resta sempre visibile.
  */
 
 import { STATE, navigaA } from './app.js';
 import { getClassifica, getPronostici, getRisultati, getSistema } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
-  TURNI, getCampione, getPron, getMatchPlayers, matchId,
-  renderBracketGrafico, renderBonus,
+  TURNI, getPron, getMatchPlayers, matchId, renderBracketGrafico,
 } from './bracket.js';
-import { calcolaPunteggio } from './punteggi.js';
+import { WINNER_POINTS, SET_POINTS, calcolaPunteggio } from './punteggi.js';
 import { rankBadge, infoBtn, openSchedaGiocatore } from './giocatore.js';
 
-const SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard';
-const GIORNI_FUTURI = 4;   // oggi + 3 giorni per le "prossime partite"
-
-let _tabsBound = false;    // i listener dei sotto-tab vanno agganciati una sola volta
+let _tabsBound = false;   // i listener dei sotto-tab si agganciano una sola volta
 
 // ── INIT ──────────────────────────────────────────────
 export async function initProfilo() {
@@ -39,19 +35,15 @@ export async function initProfilo() {
   const targetUid = STATE.profiloUid || STATE.utente.id;
   const isMe = targetUid === STATE.utente.id;
 
-  // Sotto-tab Riepilogo / Scheda
   _bindInnerTabs();
   _resetInnerTabs();
-
-  // Banner "torna alla classifica" (solo su profilo altrui)
   _renderBanner(isMe);
 
   // Stato di caricamento
   const bd = document.getElementById('profilo-breakdown');
   if (bd) bd.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Caricamento profilo…</p></div>';
-  _setHtml('profilo-imminenti', '');
-  _setHtml('profilo-partite', '');
-  _setHtml('profilo-scheda-container', '');
+  _spinner('profilo-tabellone-container');
+  _spinner('profilo-risultati-container');
 
   try {
     const db = await caricaEvento();
@@ -65,27 +57,28 @@ export async function initProfilo() {
       ? (STATE.utente.nickname || STATE.utente.nome || 'Tu')
       : (me?.nome || 'Partecipante');
 
-    // Pronostici del target
     const pron = (await getPronostici(targetUid)) || {};
     if (!pron.bracket) pron.bracket = {};
     if (!pron.bonus) pron.bonus = {};
 
-    // Privacy: scheda visibile?
     const nascosto = pron.pronostico_nascosto === true;
     const puoVedere = isMe || STATE.utente.isAdmin || !aperti || !nascosto;
 
-    // Titolo
     const title = document.getElementById('profilo-page-title');
     if (title) title.textContent = isMe ? '📊 Il mio profilo' : `📊 ${nome}`;
 
-    // Stato risultati (per i confronti "live")
-    const stato = _statoTorneo(risultati, db);
+    // Mappe vincitori/set per turno: scelte utente e risultati reali.
+    const userPicks = {}, realPicks = {}, realWinnersByRound = {};
+    TURNI.forEach(t => {
+      userPicks[t.id] = _vincitoriMap(pron, t.id);
+      realPicks[t.id] = _vincitoriMap(risultati, t.id);
+      realWinnersByRound[t.id] = new Set(Object.keys(realPicks[t.id]));
+    });
 
     _renderScoreCard(me, nome, isMe, classifica);
     _renderBreakdown(me, pron, risultati, db);
-    _renderKeyPicks(pron, db, stato, puoVedere, nascosto);
-    _renderScheda(pron, db, puoVedere, nascosto, aperti);
-    _renderProssime(pron, db, stato, puoVedere);
+    _renderTabellone(pron, risultati, db, realWinnersByRound, puoVedere);
+    _renderRisultati(pron, risultati, db, userPicks, realPicks, puoVedere);
   } catch (err) {
     if (bd) bd.innerHTML =
       `<div class="empty-state"><div class="empty-icon">⚠️</div>` +
@@ -93,7 +86,7 @@ export async function initProfilo() {
   }
 }
 
-// ── BANNER / TAB ──────────────────────────────────────
+// ── BANNER / SOTTO-TAB ────────────────────────────────
 function _renderBanner(isMe) {
   const banner = document.getElementById('profilo-header-banner');
   if (!banner) return;
@@ -106,32 +99,30 @@ function _renderBanner(isMe) {
   if (btn) btn.addEventListener('click', () => navigaA('classifica'));
 }
 
-/** Switch dei sotto-tab (Riepilogo / Scheda). I bottoni sono statici in index.html,
- *  quindi i listener si agganciano una volta sola. */
+/** Switch dei sotto-tab. I bottoni sono statici in index.html → listener una volta sola. */
 function _bindInnerTabs() {
   if (_tabsBound) return;
   const bar = document.getElementById('profilo-inner-tabs');
-  if (!bar) return;
+  const page = document.getElementById('page-profilo');
+  if (!bar || !page) return;
+  const contents = [...page.children].filter(el => el.classList.contains('tab-content'));
   bar.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.tab;
       bar.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
-      ['tab-profilo-riepilogo', 'tab-profilo-scheda'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.toggle('active', id === targetId);
-      });
+      contents.forEach(c => c.classList.toggle('active', c.id === targetId));
     });
   });
   _tabsBound = true;
 }
 
 function _resetInnerTabs() {
-  const tabs = document.getElementById('profilo-inner-tabs');
-  if (tabs) tabs.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === 0));
-  ['tab-profilo-riepilogo', 'tab-profilo-scheda'].forEach((id, i) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('active', i === 0);
-  });
+  const bar = document.getElementById('profilo-inner-tabs');
+  const page = document.getElementById('page-profilo');
+  if (!bar || !page) return;
+  bar.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  const contents = [...page.children].filter(el => el.classList.contains('tab-content'));
+  contents.forEach((c, i) => c.classList.toggle('active', i === 0));
 }
 
 // ── SCORE CARD ────────────────────────────────────────
@@ -149,12 +140,11 @@ function _renderScoreCard(me, nome, isMe, classifica) {
     </div>`;
 }
 
-// ── BREAKDOWN PUNTI PER TURNO ─────────────────────────
+// ── RIEPILOGO: punti per turno (Esiti + Set) ──────────
 function _renderBreakdown(me, pron, risultati, db) {
   const box = document.getElementById('profilo-breakdown');
   if (!box) return;
 
-  // Usa il breakdown pre-calcolato (classifica); fallback: calcolo locale.
   let breakdown = me?.breakdown;
   if (!breakdown || !breakdown.perTurno) {
     breakdown = calcolaPunteggio(pron, risultati, db).breakdown;
@@ -162,273 +152,204 @@ function _renderBreakdown(me, pron, risultati, db) {
   const perTurno = breakdown.perTurno || {};
 
   const rows = TURNI.map(t => {
-    const pt = perTurno[t.id] || { esiti: 0, set: 0, indovinati: 0 };
-    const tot = (pt.esiti || 0) + (pt.set || 0);
-    const cls = tot > 0 ? '' : ' prof-row--empty';
-    return `<tr class="prof-bd-row${cls}">
+    const pt = perTurno[t.id] || { esiti: 0, set: 0 };
+    const vuoto = (pt.esiti || 0) + (pt.set || 0) === 0;
+    return `<tr class="prof-bd-row${vuoto ? ' prof-row--empty' : ''}">
       <td class="prof-bd-turno">${t.nome}</td>
-      <td class="prof-bd-num">${pt.indovinati || 0}</td>
       <td class="prof-bd-num">${pt.esiti || 0}</td>
       <td class="prof-bd-num">${pt.set || 0}</td>
-      <td class="prof-bd-num prof-bd-tot">${tot}</td>
     </tr>`;
   }).join('');
+
+  const totale = (breakdown.esiti || 0) + (breakdown.set || 0) + (breakdown.bonus || 0);
 
   box.innerHTML = `
     <div class="prof-card">
       <h3 class="prof-card-title">📈 Punti per turno</h3>
       <table class="prof-bd-table">
-        <thead><tr>
-          <th>Turno</th><th>Azzeccati</th><th>Esiti</th><th>Set</th><th>Punti</th>
-        </tr></thead>
+        <thead><tr><th>Turno</th><th>Esiti</th><th>Set</th></tr></thead>
         <tbody>${rows}</tbody>
+        <tfoot>
+          <tr class="prof-bd-totrow">
+            <td>Totale</td>
+            <td class="prof-bd-num">${breakdown.esiti || 0}</td>
+            <td class="prof-bd-num">${breakdown.set || 0}</td>
+          </tr>
+        </tfoot>
       </table>
       <div class="prof-bd-foot">
         <span class="prof-pill">Esiti <strong>${breakdown.esiti || 0}</strong></span>
-        <span class="prof-pill">Bonus-set <strong>${breakdown.set || 0}</strong></span>
-        <span class="prof-pill">Bonus statistici <strong>${breakdown.bonus || 0}</strong></span>
-        <span class="prof-pill prof-pill--tot">Totale <strong>${(breakdown.esiti || 0) + (breakdown.set || 0) + (breakdown.bonus || 0)}</strong></span>
+        <span class="prof-pill">Set <strong>${breakdown.set || 0}</strong></span>
+        <span class="prof-pill">Bonus <strong>${breakdown.bonus || 0}</strong></span>
+        <span class="prof-pill prof-pill--tot">Totale <strong>${totale}</strong></span>
       </div>
-      <p class="prof-note">«Azzeccati» = giocatori dati vincitori che hanno davvero vinto in quel turno. Il bonus-set premia il numero di set esatto (solo se il vincitore è corretto).</p>
     </div>`;
 }
 
-// ── PRONOSTICI CHIAVE ─────────────────────────────────
-function _renderKeyPicks(pron, db, stato, puoVedere, nascosto) {
-  const box = document.getElementById('profilo-imminenti');
+// ── TABELLONE: bracket con indovinati evidenziati ─────
+function _renderTabellone(pron, risultati, db, realWinnersByRound, puoVedere) {
+  const box = document.getElementById('profilo-tabellone-container');
   if (!box) return;
-
-  if (!puoVedere) {
-    box.innerHTML = `
-      <div class="prof-card prof-card--locked">
-        <h3 class="prof-card-title">🙈 Pronostici nascosti</h3>
-        <p class="text-muted">Questo partecipante ha scelto di nascondere la propria scheda finché i pronostici sono aperti.</p>
-      </div>`;
-    return;
-  }
-
-  const campione = getCampione(pron);
-  const finalisti = _vincitoriRound(pron, 'SF');
-  const semifinalisti = _vincitoriRound(pron, 'QF');
-
-  if (!campione && !finalisti.length && !semifinalisti.length) {
-    box.innerHTML = `
-      <div class="prof-card">
-        <h3 class="prof-card-title">🎯 Pronostici chiave</h3>
-        <p class="text-muted">Nessun pronostico nelle fasi finali ancora compilato.</p>
-      </div>`;
-    return;
-  }
-
-  const champHtml = campione
-    ? _chipGiocatore(db, campione, _statoPick(campione, 'F', stato))
-    : '<span class="text-muted">—</span>';
+  if (!puoVedere) { box.innerHTML = _hiddenMsg(); return; }
 
   box.innerHTML = `
-    <div class="prof-card">
-      <h3 class="prof-card-title">🎯 Pronostici chiave</h3>
-      <div class="prof-keys">
-        <div class="prof-key-group">
-          <div class="prof-key-label">🏆 Campione</div>
-          <div class="prof-chips">${champHtml}</div>
-        </div>
-        <div class="prof-key-group">
-          <div class="prof-key-label">🥈 Finalisti</div>
-          <div class="prof-chips">${_chipList(db, finalisti, 'SF', stato)}</div>
-        </div>
-        <div class="prof-key-group">
-          <div class="prof-key-label">🎽 Semifinalisti</div>
-          <div class="prof-chips">${_chipList(db, semifinalisti, 'QF', stato)}</div>
-        </div>
-      </div>
-      <p class="prof-note">✅ raggiunto · ⏳ ancora in corsa · ❌ eliminato — rispetto ai risultati ufficiali.</p>
-    </div>`;
-
-  box.querySelectorAll('.player-info-btn[data-info]').forEach(btn => {
-    btn.addEventListener('click', (e) => { e.stopPropagation(); openSchedaGiocatore(db, btn.dataset.info); });
-  });
-}
-
-function _chipList(db, pids, round, stato) {
-  if (!pids.length) return '<span class="text-muted">—</span>';
-  return pids.map(pid => _chipGiocatore(db, pid, _statoPick(pid, round, stato))).join('');
-}
-
-function _chipGiocatore(db, pid, st) {
-  const icon = st === 'ok' ? '✅' : st === 'out' ? '❌' : '⏳';
-  const cls = st === 'ok' ? ' prof-chip--ok' : st === 'out' ? ' prof-chip--out' : ' prof-chip--live';
-  return `<span class="prof-chip${cls}">
-    <span class="prof-chip-ic">${icon}</span>
-    <span class="prof-chip-name">${nomeGiocatore(db, pid)}</span>${rankBadge(db, pid)}
-    ${infoBtn(pid)}
-  </span>`;
-}
-
-// ── SCHEDA (tabellone grafico + bonus) ────────────────
-function _renderScheda(pron, db, puoVedere, nascosto, aperti) {
-  const box = document.getElementById('profilo-scheda-container');
-  if (!box) return;
-
-  if (!puoVedere) {
-    box.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🙈</div>
-        <p>Scheda nascosta</p>
-        <p class="text-muted">Sarà visibile a tutti quando i pronostici verranno chiusi.</p>
-      </div>`;
-    return;
-  }
-
-  box.innerHTML = `
-    <div class="prof-card">
-      <h3 class="prof-card-title">🗺️ Tabellone pronosticato</h3>
-      <div id="profilo-bracket-grafico"></div>
+    <div class="prof-legend">
+      <span class="prof-legend-item"><span class="prof-legend-sw prof-legend-sw--pick"></span> la tua scelta</span>
+      <span class="prof-legend-item"><span class="prof-legend-sw prof-legend-sw--ok"></span> indovinato</span>
     </div>
-    <div class="prof-card">
-      <div id="profilo-bonus-box"></div>
-    </div>`;
+    <div class="prof-card"><div id="profilo-bracket-grafico"></div></div>
+    <div class="prof-card"><div id="profilo-bonus-box"></div></div>`;
 
-  renderBracketGrafico(document.getElementById('profilo-bracket-grafico'), pron, db);
-  renderBonus(document.getElementById('profilo-bonus-box'), pron, db);
+  renderBracketGrafico(document.getElementById('profilo-bracket-grafico'), pron, db, realWinnersByRound);
+  _renderBonusConfronto(document.getElementById('profilo-bonus-box'), pron, risultati, db);
 }
 
-// ── PROSSIME PARTITE (calendario live ESPN) ───────────
-async function _renderProssime(pron, db, stato, puoVedere) {
-  const box = document.getElementById('profilo-partite');
-  if (!box) return;
-  if (!puoVedere) { box.innerHTML = ''; return; }
-
-  // Giocatori "scelti" (dati vincitori in QUALSIASI turno) e ancora non eliminati.
-  const scelti = new Set();
-  TURNI.forEach(t => Object.keys(_vincitoriRoundMap(pron, t.id)).forEach(pid => scelti.add(pid)));
-  const vivi = [...scelti].filter(pid => !stato.eliminati.has(pid));
-
-  // Mappa espnId → pid (per riconoscere i match dal calendario ESPN).
-  const espnToPid = new Map();
-  vivi.forEach(pid => {
-    const eid = db.giocatori?.[pid]?.espnId;
-    if (eid) espnToPid.set(String(eid), pid);
+function _renderBonusConfronto(container, pron, risultati, db) {
+  if (!container) return;
+  const cats = db.bonus || [];
+  if (!cats.length) { container.innerHTML = ''; return; }
+  let html = '<h4 class="prof-bonus-title">🏆 Bonus fine torneo</h4><div class="prof-bonus-list">';
+  cats.forEach(c => {
+    const pick = pron?.bonus?.[c.id];
+    const real = risultati?.bonus?.[c.id];
+    let esito = '';
+    if (pick && real) {
+      esito = pick === real
+        ? '<span class="prof-pts prof-pts--ok">✓</span>'
+        : '<span class="prof-pts prof-pts--no">✗</span>';
+    }
+    html += `<div class="prof-bonus-row">
+      <span class="prof-bonus-label">${c.label}</span>
+      <span class="prof-bonus-val">${pick ? nomeGiocatore(db, pick) : '—'} ${esito}</span>
+    </div>`;
   });
-  if (!espnToPid.size) { box.innerHTML = ''; return; }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ── RISULTATI: turno per turno con esito/set indovinati ─
+function _renderRisultati(pron, risultati, db, userPicks, realPicks, puoVedere) {
+  const box = document.getElementById('profilo-risultati-container');
+  if (!box) return;
+  if (!puoVedere) { box.innerHTML = _hiddenMsg(); return; }
+
+  const conRis = TURNI.filter(t => Object.keys(realPicks[t.id] || {}).length > 0);
+  if (!conRis.length) {
+    box.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div>
+      <p>Nessun risultato disponibile</p>
+      <p class="text-muted">I risultati appariranno qui man mano che il torneo procede.</p></div>`;
+    return;
+  }
+  const defRound = conRis[conRis.length - 1].id;
+
+  const tabsHtml = conRis.map(t =>
+    `<button type="button" class="prof-round-btn${t.id === defRound ? ' active' : ''}" data-round="${t.id}">${t.nome}</button>`
+  ).join('');
 
   box.innerHTML = `
-    <div class="prof-card">
-      <h3 class="prof-card-title">📅 Prossime partite dei tuoi giocatori</h3>
-      <div id="prof-prossime-list"><span class="pc-loading">Carico il calendario…</span></div>
-    </div>`;
-  const list = document.getElementById('prof-prossime-list');
+    <div class="prof-round-tabs">${tabsHtml}</div>
+    <div id="profilo-risultati-round"></div>`;
 
-  let matches = [];
-  try {
-    matches = await _fetchProssime(espnToPid);
-  } catch (_) {
-    list.innerHTML = '<p class="text-muted">Calendario non disponibile al momento.</p>';
-    return;
+  const render = (rid) => _renderRisultatiRound(rid, pron, risultati, db, userPicks);
+  box.querySelectorAll('.prof-round-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      box.querySelectorAll('.prof-round-btn').forEach(b => b.classList.toggle('active', b === btn));
+      render(btn.dataset.round);
+    });
+  });
+  render(defRound);
+}
+
+function _renderRisultatiRound(roundId, pron, risultati, db, userPicks) {
+  const cont = document.getElementById('profilo-risultati-round');
+  if (!cont) return;
+  const t = TURNI.find(x => x.id === roundId);
+  if (!t) return;
+  const up = userPicks[roundId] || {};
+  const winPts = WINNER_POINTS[roundId], setPts = SET_POINTS[roundId];
+
+  let cards = '', nEsiti = 0, nSet = 0, pts = 0;
+
+  for (let i = 0; i < t.matches; i++) {
+    const mid = matchId(roundId, i);
+    const { a, b } = getMatchPlayers(roundId, i, risultati, db);
+    const p = getPron(risultati, roundId, mid);
+    const vinc = (p && (p.vincitore === a || p.vincitore === b)) ? p.vincitore : null;
+    if (!vinc) continue; // solo partite concluse
+
+    const realSet = p.set || '';
+    const esitoOk = Object.prototype.hasOwnProperty.call(up, vinc);
+    const userSet = up[vinc];
+    const setOk = esitoOk && userSet && realSet && userSet === realSet;
+    if (esitoOk) { nEsiti++; pts += winPts; }
+    if (setOk) { nSet++; pts += setPts; }
+
+    const side = (pid, isWin) => {
+      if (!pid) return `<div class="match-side"><span class="match-team match-team--ro match-team--empty">—</span></div>`;
+      const cls = 'match-team match-team--ro' + (isWin ? ' selected' : ' match-team--lose');
+      return `<div class="match-side">
+        <span class="${cls}"><span class="mt-name">${isWin ? '🏆 ' : ''}${nomeGiocatore(db, pid)}</span>${rankBadge(db, pid)}</span>
+        ${infoBtn(pid)}
+      </div>`;
+    };
+
+    let status;
+    if (esitoOk) {
+      status = `<span class="prof-pts prof-pts--ok">✓ Esito +${winPts}</span>` +
+        (setOk
+          ? `<span class="prof-pts prof-pts--set">🎾 Set esatto +${setPts}</span>`
+          : (userSet ? `<span class="prof-pts prof-pts--miss">il tuo set: ${userSet}</span>` : ''));
+    } else {
+      status = `<span class="prof-pts prof-pts--no">✗ esito non indovinato</span>`;
+    }
+
+    const setPill = realSet
+      ? `<span class="match-set-label">set</span><span class="set-opt selected">${realSet}</span>`
+      : `<span class="ris-pending">concluso</span>`;
+
+    cards += `<div class="match-card match-done prof-res-card${esitoOk ? ' prof-res-hit' : ''}">
+      <span class="match-num">${i + 1}</span>
+      <div class="match-teams">${side(a, vinc === a)}<span class="match-vs">vs</span>${side(b, vinc === b)}</div>
+      <div class="match-set">${setPill}</div>
+      <div class="prof-res-status">${status}</div>
+    </div>`;
   }
 
-  if (!matches.length) {
-    list.innerHTML = '<p class="text-muted">Nessuna partita in programma a breve per i giocatori che hai pronosticato ancora in corsa.</p>';
-    return;
-  }
+  const head = `<div class="prof-res-head">
+    <h3 class="prof-card-title">${t.nome}</h3>
+    <span class="prof-res-sum">${nEsiti} esiti · ${nSet} set · <strong>${pts} pt</strong></span>
+  </div>`;
 
-  list.innerHTML = matches.slice(0, 10).map(m => {
-    const live = m.state === 'in';
-    const teams = m.players.map(p => {
-      const mine = espnToPid.has(p.id) ? ' prof-pm-mine' : '';
-      const flag = p.flag ? `<img class="pc-flag" src="${p.flag}" alt=""> ` : '';
-      return `<span class="prof-pm-team${mine}">${flag}${p.name || '—'}</span>`;
-    }).join('<span class="prof-pm-vs">vs</span>');
-    const meta = [m.tournament, m.round].filter(Boolean).join(' · ');
-    const when = live
-      ? '<span class="prof-pm-live">🔴 in corso</span>'
-      : `<span class="prof-pm-when">${_dataOra(m.date)}</span>`;
-    return `<div class="prof-pm-row">
-      <div class="prof-pm-teams">${teams}</div>
-      <div class="prof-pm-meta">${meta}</div>
-      <div class="prof-pm-time">${when}</div>
-    </div>`;
-  }).join('');
-}
+  cont.innerHTML = head +
+    (cards
+      ? `<div class="round-matches">${cards}</div>`
+      : '<p class="text-muted">Nessuna partita conclusa in questo turno.</p>');
 
-function _fetchProssime(espnToPid) {
-  const urls = _giorniFuturi(GIORNI_FUTURI).map(d => `${SCOREBOARD}?dates=${d}`);
-  return Promise.all(urls.map(u => _fetchJson(u).catch(() => null))).then(lists => {
-    const out = [];
-    const seen = new Set();
-    for (const data of lists) {
-      if (!data) continue;
-      for (const ev of (data.events || [])) {
-        const tname = ev.name || '';
-        for (const g of (ev.groupings || [])) {
-          const slug = (g.grouping && g.grouping.slug) || g.slug;
-          if (slug !== 'mens-singles') continue;
-          for (const c of (g.competitions || [])) {
-            if (!c.id || seen.has(c.id)) continue;
-            const st = (c.status && c.status.type) || {};
-            if (st.state === 'post' || st.completed === true) continue; // solo da giocare / in corso
-            const comps = c.competitors || [];
-            if (comps.length !== 2) continue;
-            const ids = comps.map(x => String(x.id || ''));
-            if (ids.some(i => i.includes('-'))) continue;             // niente doppio
-            if (!ids.some(i => espnToPid.has(i))) continue;            // almeno un mio giocatore
-            seen.add(c.id);
-            out.push({
-              date: c.date, tournament: tname,
-              round: (c.round && c.round.displayName) || '',
-              state: st.state,
-              players: comps.map(x => ({
-                id: String(x.id || ''),
-                name: (x.athlete && x.athlete.displayName) || '',
-                flag: (x.athlete && x.athlete.flag && x.athlete.flag.href) || null,
-              })),
-            });
-          }
-        }
-      }
-    }
-    out.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-    return out;
+  cont.querySelectorAll('.player-info-btn[data-info]').forEach(btn => {
+    btn.addEventListener('click', () => openSchedaGiocatore(db, btn.dataset.info));
   });
-}
-
-// ── STATO TORNEO (dai risultati ufficiali) ────────────
-/** Calcola: vincitori reali per turno + insieme dei giocatori eliminati. */
-function _statoTorneo(risultati, db) {
-  const winnersByRound = {};
-  const eliminati = new Set();
-  TURNI.forEach(t => {
-    const set = new Set();
-    for (let i = 0; i < t.matches; i++) {
-      const mid = matchId(t.id, i);
-      const p = getPron(risultati, t.id, mid);
-      if (!p?.vincitore) continue;
-      const { a, b } = getMatchPlayers(t.id, i, risultati, db);
-      if (p.vincitore !== a && p.vincitore !== b) continue;
-      set.add(p.vincitore);
-      const perdente = p.vincitore === a ? b : a;
-      if (perdente) eliminati.add(perdente);
-    }
-    winnersByRound[t.id] = set;
-  });
-  return { winnersByRound, eliminati };
-}
-
-/** Stato di un pronostico chiave: 'ok' (raggiunto), 'out' (eliminato), 'live'. */
-function _statoPick(pid, round, stato) {
-  if (stato.winnersByRound[round]?.has(pid)) return 'ok';
-  if (stato.eliminati.has(pid)) return 'out';
-  return 'live';
 }
 
 // ── HELPERS ───────────────────────────────────────────
-function _vincitoriRoundMap(pron, roundId) {
+/** Mappa { playerId: set } dei vincitori indicati in un turno (scelte o risultati). */
+function _vincitoriMap(doc, roundId) {
   const out = {};
-  const matches = pron?.bracket?.[roundId] || {};
-  Object.values(matches).forEach(m => { if (m && m.vincitore) out[m.vincitore] = true; });
+  const matches = doc?.bracket?.[roundId] || {};
+  Object.values(matches).forEach(m => { if (m && m.vincitore) out[m.vincitore] = m.set || null; });
   return out;
 }
-function _vincitoriRound(pron, roundId) {
-  return Object.keys(_vincitoriRoundMap(pron, roundId));
+
+function _hiddenMsg() {
+  return `<div class="empty-state">
+      <div class="empty-icon">🙈</div>
+      <p>Scheda nascosta</p>
+      <p class="text-muted">Questo partecipante ha nascosto la propria scheda finché i pronostici sono aperti.</p>
+    </div>`;
+}
+
+function _spinner(id) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Caricamento…</p></div>';
 }
 
 /** Posizione (con ex-aequo) di un uid nella classifica, stessa logica di classifica.js. */
@@ -459,40 +380,4 @@ function _posLabel(pos) {
   if (!pos) return '—';
   const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
   return medals[pos] || `${pos}°`;
-}
-
-function _setHtml(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
-
-function _fetchJson(url, timeout = 12000) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeout);
-  return fetch(url, { signal: ctrl.signal, cache: 'no-cache' })
-    .then(r => r.ok ? r.json() : null)
-    .finally(() => clearTimeout(t));
-}
-
-/** YYYYMMDD per oggi e i prossimi n-1 giorni (fuso Europe/London). */
-function _giorniFuturi(n) {
-  const out = [];
-  for (let i = 0; i < n; i++) {
-    const d = new Date(Date.now() + i * 86400000);
-    const s = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit',
-    }).format(d);
-    out.push(s.replace(/-/g, ''));
-  }
-  return out;
-}
-
-function _dataOra(iso) {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    const oggi = new Date();
-    const stessoGiorno = d.toDateString() === oggi.toDateString();
-    const ora = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
-    if (stessoGiorno) return `Oggi ${ora}`;
-    const data = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', timeZone: 'Europe/Rome' });
-    return `${data} ${ora}`;
-  } catch { return ''; }
 }

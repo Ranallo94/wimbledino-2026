@@ -169,7 +169,9 @@ export function renderTabellone(container, pron, db) {
 // Disegna l'albero a eliminazione diretta da 128 con connettori SVG.
 // `pron` = documento pronostici/risultati da cui leggere i vincitori per turno.
 // Read-only: evidenzia il vincitore scelto in ogni match e i percorsi.
-export function renderBracketGrafico(container, pron, db) {
+// `realWinners` (opzionale) = { roundId: Set(playerId) } dei vincitori reali per
+// turno: se passato, evidenzia con `bk-correct` le scelte dell'utente azzeccate.
+export function renderBracketGrafico(container, pron, db, realWinners) {
   if (!container) return;
 
   const COL_W = 184;   // larghezza colonna (turno)
@@ -236,7 +238,10 @@ export function renderBracketGrafico(container, pron, db) {
       const left = ri * COL_W + PAD_X;
       const slot = (pid) => {
         if (!pid) return `<div class="bk-slot bk-empty">·</div>`;
-        const w = win === pid ? ' bk-win' : (win ? ' bk-lose' : '');
+        let w = win === pid ? ' bk-win' : (win ? ' bk-lose' : '');
+        if (realWinners && win === pid && realWinners[t.id] && realWinners[t.id].has(pid)) {
+          w += ' bk-correct';
+        }
         return `<div class="bk-slot${w}" title="${nomeGiocatore(db, pid)}">${nomeGiocatore(db, pid)}</div>`;
       };
       boxes += `<div class="bk-match" style="top:${top}px;left:${left}px;width:${BOX_W}px;height:${MATCH_H}px">${slot(a)}${slot(b)}</div>`;
