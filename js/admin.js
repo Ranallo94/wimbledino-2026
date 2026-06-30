@@ -366,6 +366,12 @@ function _renderRoundRisultati(roundId) {
   const box = document.getElementById('risround-' + roundId);
   if (!box) return;
   const t = TURNI.find(x => x.id === roundId);
+  if (!t) { box.innerHTML = '<p class="match-locked-msg">⚠️ Turno non trovato.</p>'; return; }
+  // Diagnostica: se il tabellone non è caricato, dillo invece di restare vuoto.
+  if (roundId === 'R128' && (!_db || !Array.isArray(_db.draw_R128) || _db.draw_R128.length === 0)) {
+    box.innerHTML = '<p class="match-locked-msg">⚠️ Tabellone non caricato: manca <code>draw_R128</code> in wimbledon_db.json (controlla il deploy e ricarica con Ctrl+Shift+R).</p>';
+    return;
+  }
 
   let html = '';
   let compilati = 0;
