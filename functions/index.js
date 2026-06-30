@@ -114,9 +114,15 @@ async function _sincronizza(origine) {
     if (now < nextAt) return { skipped: true, motivo: 'in attesa del prossimo check' };
   }
 
+  // 0) Override manuali già confermati dall'admin: vanno preservati (l'API non
+  //    li sovrascrive) e usati per derivare gli accoppiamenti dei turni dopo.
+  const prevSnap = await db.doc('risultati/ufficiali').get();
+  const seed = _soloManuali(prevSnap.exists ? prevSnap.data().bracket : null);
+  const protetti = Object.values(seed).reduce((s, r) => s + Object.keys(r).length, 0);
+
   // 1) ESPN → match conclusi + stato (quante partite in corso / in programma).
   const { matches, live, prossimi } = await espn.fetchWimbledon(GIORNI_FINESTRA);
-  const { bracket, nonMappati, nMatch } = espn.bracketDaMatches(matches);
+  const { bracket, nonMappati, nMatch } = espn.bracketDaMatches(matches, seed);
 
   // 2) Scrive i risultati (merge: preserva correzioni manuali e bonus).
   if (nMatch > 0) {
@@ -135,11 +141,26 @@ async function _sincronizza(origine) {
     live,
     prossimi,
     prossimo_check_min: minuti,
+    protetti_manuali: protetti,
     non_mappati: nonMappati.slice(0, 20),
   });
 
-  console.log(`[sync] ${origine} espn=${matches.length} scritti=${nMatch} live=${live} prossimi=${prossimi} next=${minuti}min`);
-  return { match_espn: matches.length, match_scritti: nMatch, live, prossimi, prossimo_check_min: minuti, non_mappati: nonMappati };
+  console.log(`[sync] ${origine} espn=${matches.length} scritti=${nMatch} manuali=${protetti} live=${live} prossimi=${prossimi} next=${minuti}min`);
+  return { match_espn: matches.length, match_scritti: nMatch, protetti_manuali: protetti, live, prossimi, prossimo_check_min: minuti, non_mappati: nonMappati };
+}
+
+/** Estrae solo i risultati marcati `manuale` (override admin) dal bracket salvato. */
+function _soloManuali(bracket) {
+  const out = {};
+  for (const [r, matches] of Object.entries(bracket || {})) {
+    for (const [mid, m] of Object.entries(matches || {})) {
+      if (m && m.manuale && m.vincitore) {
+        if (!out[r]) out[r] = {};
+        out[r][mid] = { vincitore: m.vincitore, set: m.set || '', manuale: true };
+      }
+    }
+  }
+  return out;
 }
 
 /** Salva timestamp ultimo sync, prossimo check (per il polling adattivo) e log diagnostico. */

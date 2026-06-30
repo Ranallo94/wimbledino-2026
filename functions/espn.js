@@ -193,27 +193,53 @@ function costruisciPool(espnMatches) {
   return { pool, nonMappati };
 }
 
-/** Propaga il tabellone: per ogni slot derivato cerca l'esito nel pool. */
-function propagaBracket(pool) {
+/**
+ * Propaga il tabellone: per ogni slot derivato cerca l'esito nel pool.
+ * @param {Object} pool  esiti ESPN { "pidA|pidB" → {winner,set} }
+ * @param {Object} [seed] risultati MANUALI (override admin) già confermati:
+ *   { round: { mid: {vincitore,set,manuale:true} } }. Vengono usati per
+ *   derivare gli accoppiamenti dei turni successivi e NON vengono MAI
+ *   sovrascritti dagli esiti ESPN.
+ */
+function propagaBracket(pool, seed) {
   const result = { bracket: {} };
+
+  // 1) Inietta gli override manuali (così i turni dopo derivano dai vincitori reali).
+  if (seed) {
+    for (const [r, matches] of Object.entries(seed)) {
+      for (const [mid, m] of Object.entries(matches || {})) {
+        if (!m || !m.vincitore) continue;
+        if (!result.bracket[r]) result.bracket[r] = {};
+        result.bracket[r][mid] = { ...m };
+      }
+    }
+  }
+
+  // 2) Propaga dagli esiti ESPN, senza toccare i match marcati manuale.
   for (const t of TURNI) {
     const r = t.id;
     for (let i = 0; i < t.matches; i++) {
+      const mid = matchId(r, i);
+      if (result.bracket[r] && result.bracket[r][mid] && result.bracket[r][mid].manuale) continue; // override protetto
       const { a, b } = getMatchPlayers(r, i, result, DB);
       if (!a || !b) continue;
       const hit = pool[[a, b].sort().join('|')];
       if (!hit) continue;
       if (!result.bracket[r]) result.bracket[r] = {};
-      result.bracket[r][matchId(r, i)] = { vincitore: hit.winner, set: hit.set || '' };
+      result.bracket[r][mid] = { vincitore: hit.winner, set: hit.set || '' };
     }
   }
   return result.bracket;
 }
 
-/** Da match ESPN → bracket pronto da scrivere. Ritorna { bracket, nonMappati, nMatch }. */
-function bracketDaMatches(espnMatches) {
+/**
+ * Da match ESPN → bracket pronto da scrivere. Ritorna { bracket, nonMappati, nMatch }.
+ * @param {Array}  espnMatches  match conclusi da ESPN
+ * @param {Object} [seed]       override manuali da preservare/propagare
+ */
+function bracketDaMatches(espnMatches, seed) {
   const { pool, nonMappati } = costruisciPool(espnMatches);
-  const bracket = propagaBracket(pool);
+  const bracket = propagaBracket(pool, seed);
   const nMatch = Object.values(bracket).reduce((s, r) => s + Object.keys(r).length, 0);
   return { bracket, nonMappati, nMatch };
 }
