@@ -50,12 +50,16 @@ export async function initAdmin() {
   _buildShell();
   _built = true;
 
-  await _caricaConfigMontepremi();
-  await _caricaPartecipanti();
+  // I risultati sono la sezione critica: renderizzali SUBITO, così un eventuale
+  // errore nei caricamenti successivi (montepremi/partecipanti/Firestore) non
+  // lascia la lista partite vuota.
   TURNI.forEach(t => _renderRoundRisultati(t.id));
   _renderBonus();
-  await _renderSistema();
-  await _renderMontepremi();
+
+  try { await _caricaConfigMontepremi(); } catch (e) { console.error('[admin] config montepremi', e); }
+  try { await _caricaPartecipanti(); }     catch (e) { console.error('[admin] partecipanti', e); }
+  try { await _renderSistema(); }          catch (e) { console.error('[admin] sistema', e); }
+  try { await _renderMontepremi(); }       catch (e) { console.error('[admin] montepremi', e); }
 
   if (_unsubSistema) _unsubSistema();
   _unsubSistema = onSistemaSnapshot((cfg) => {
