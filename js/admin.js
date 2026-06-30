@@ -73,13 +73,13 @@ function _buildShell() {
   const page = document.getElementById('page-admin');
 
   const roundTabs = TURNI.map((t, i) =>
-    `<button type="button" class="tab${i === 0 ? ' active' : ''}" data-tab="ris-${t.id}" data-rround="${t.id}">${t.nome}</button>`
+    `<button type="button" class="tab${i === 0 ? ' active' : ''}" data-tab="adm-ris-${t.id}" data-rround="${t.id}">${t.nome}</button>`
   ).join('');
   const roundContents = TURNI.map((t, i) =>
-    `<div id="ris-${t.id}" class="tab-content${i === 0 ? ' active' : ''}">
+    `<div id="adm-ris-${t.id}" class="tab-content${i === 0 ? ' active' : ''}">
        <div class="round-head"><h4 class="section-title">${t.nome} — risultati reali</h4>
-         <span class="round-progress" id="risprog-${t.id}"></span></div>
-       <div id="risround-${t.id}" class="round-matches"></div>
+         <span class="round-progress" id="adm-risprog-${t.id}"></span></div>
+       <div id="adm-risround-${t.id}" class="round-matches"></div>
        <div class="elim-save-row">
          <button type="button" class="btn btn-primary" data-savris="${t.id}">💾 Salva risultati ${t.nome}</button>
          <span class="elim-save-msg" id="rismsg-${t.id}"></span>
@@ -177,7 +177,7 @@ function _buildShell() {
   if (tabRis) tabRis.addEventListener('click', () => setTimeout(() => {
     page.querySelectorAll('#ris-round-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.rround === _activeRound));
     TURNI.forEach(t => {
-      const c = document.getElementById('ris-' + t.id);
+      const c = document.getElementById('adm-ris-' + t.id);
       if (c) c.classList.toggle('active', t.id === _activeRound);
     });
     _renderRoundRisultati(_activeRound);
@@ -363,7 +363,7 @@ async function _toggleOff(uid) {
 
 // ── RISULTATI (turno per turno) ───────────────────────
 function _renderRoundRisultati(roundId) {
-  const box = document.getElementById('risround-' + roundId);
+  const box = document.getElementById('adm-risround-' + roundId);
   if (!box) return;
   const t = TURNI.find(x => x.id === roundId);
   if (!t) { box.innerHTML = '<p class="match-locked-msg">⚠️ Turno non trovato.</p>'; return; }
@@ -409,7 +409,7 @@ function _renderRoundRisultati(roundId) {
     </div>`;
   }
   box.innerHTML = html;
-  const prog = document.getElementById('risprog-' + roundId);
+  const prog = document.getElementById('adm-risprog-' + roundId);
   if (prog) prog.textContent = `${compilati}/${t.matches}`;
 
   box.querySelectorAll('.match-team[data-pid]').forEach(btn =>
