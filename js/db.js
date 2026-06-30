@@ -5,7 +5,7 @@
  */
 
 import {
-  doc, getDoc, setDoc, updateDoc, onSnapshot,
+  doc, getDoc, setDoc, updateDoc, onSnapshot, deleteField,
   collection, getDocs, query, orderBy, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -84,6 +84,20 @@ export async function setRisultati(dati) {
     ...dati,
     updatedAt: serverTimestamp(),
   }, { merge: true });
+}
+
+/**
+ * Rimuove un singolo match dal bracket dei risultati ufficiali.
+ * Necessario perché il merge NON cancella i campi: per togliere un override
+ * (e farlo tornare gestibile dall'API) serve una delete esplicita del path.
+ * @param {string} roundId  es. 'R128'
+ * @param {string} mid      es. 'R128_32'
+ */
+export async function deleteRisultatoMatch(roundId, mid) {
+  await updateDoc(doc(db(), 'risultati', 'ufficiali'), {
+    [`bracket.${roundId}.${mid}`]: deleteField(),
+    updatedAt: serverTimestamp(),
+  });
 }
 
 // ── CLASSIFICA ────────────────────────────────────────

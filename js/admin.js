@@ -14,7 +14,7 @@
 import { STATE } from './app.js';
 import {
   getPartecipanti, updatePartecipante, setPagamento,
-  getRisultati, setRisultati, onRisultatiSnapshot,
+  getRisultati, setRisultati, deleteRisultatoMatch, onRisultatiSnapshot,
   getTuttiPronostici, saveClassifica, getClassifica,
   getSistema, updateSistema, onSistemaSnapshot, getClassificaUpdatedAt,
 } from './db.js';
@@ -107,7 +107,7 @@ function _buildShell() {
     <div id="tab-admin-risultati" class="tab-content">
       <div class="info-banner info-banner--yellow">
         <span>📝</span>
-        <span>Inserisci i vincitori reali turno per turno. Dopo il salvataggio la classifica viene ricalcolata automaticamente.</span>
+        <span>Inserisci i vincitori reali turno per turno. <strong>Ogni risultato inserito a mano è un override sull'API</strong> (🔒): il sync automatico ESPN non lo sovrascrive. Usa <strong>↺</strong> sul match per riportarlo in automatico. Dopo il salvataggio la classifica viene ricalcolata.</span>
       </div>
       <div class="tab-bar" id="ris-round-tabs">${roundTabs}</div>
       ${roundContents}
@@ -372,6 +372,7 @@ function _renderRoundRisultati(roundId) {
     const p = getPron(_ris, roundId, mid);
     const vinc = (p && (p.vincitore === a || p.vincitore === b)) ? p.vincitore : null;
     const set = vinc ? (p.set || '') : '';
+    const manuale = vinc && p && p.manuale === true;
     if (vinc) compilati++;
 
     if (!a && !b) {
@@ -387,10 +388,14 @@ function _renderRoundRisultati(roundId) {
     const setBtns = SET_OPTIONS.map(s =>
       `<button type="button" class="set-opt${set === s ? ' selected' : ''}" data-mid="${mid}" data-round="${roundId}" data-set="${s}">${s}</button>`
     ).join('');
-    html += `<div class="match-card${vinc ? ' match-done' : ''}">
+    const ovrTag = manuale
+      ? `<button type="button" class="ovr-tag" data-clearovr="${mid}" data-round="${roundId}" title="Risultato inserito a mano (l'API non lo sovrascrive). Clicca per tornare ad automatico.">🔒 manuale ↺</button>`
+      : '';
+    html += `<div class="match-card${vinc ? ' match-done' : ''}${manuale ? ' match-manuale' : ''}">
       <span class="match-num">${i + 1}</span>
       <div class="match-teams">${opt(a)}<span class="match-vs">vs</span>${opt(b)}</div>
       <div class="match-set${vinc ? '' : ' match-set--hidden'}"><span class="match-set-label">set</span>${setBtns}</div>
+      ${ovrTag}
     </div>`;
   }
   box.innerHTML = html;
@@ -401,18 +406,35 @@ function _renderRoundRisultati(roundId) {
     btn.addEventListener('click', () => { _setRisVincitore(btn.dataset.round, btn.dataset.mid, btn.dataset.pid); _renderRoundRisultati(btn.dataset.round); }));
   box.querySelectorAll('.set-opt[data-set]').forEach(btn =>
     btn.addEventListener('click', () => { _setRisSet(btn.dataset.round, btn.dataset.mid, btn.dataset.set); _renderRoundRisultati(btn.dataset.round); }));
+  box.querySelectorAll('.ovr-tag[data-clearovr]').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      const r = btn.dataset.round, mid = btn.dataset.clearovr;
+      _clearOverride(r, mid);
+      _renderRoundRisultati(r);
+      try {
+        await deleteRisultatoMatch(r, mid); // delete reale: il merge non cancella i campi
+        showToast('Override rimosso: il match torna automatico.', 'info');
+        await _ricalcola(false);
+      } catch (err) { showToast('Errore: ' + err.message, 'error'); }
+    }));
 }
 
 function _setRisVincitore(roundId, mid, pid) {
   if (!_ris.bracket[roundId]) _ris.bracket[roundId] = {};
   const cur = _ris.bracket[roundId][mid] || {};
   if (cur.vincitore === pid) delete _ris.bracket[roundId][mid];
-  else _ris.bracket[roundId][mid] = { vincitore: pid, set: cur.set || '' };
+  // Inserimento a mano = override sull'API: marcato `manuale`, il sync ESPN non lo tocca.
+  else _ris.bracket[roundId][mid] = { vincitore: pid, set: cur.set || '', manuale: true };
 }
 function _setRisSet(roundId, mid, set) {
   const cur = _ris.bracket[roundId]?.[mid];
   if (!cur || !cur.vincitore) return;
   cur.set = (cur.set === set) ? '' : set;
+  cur.manuale = true; // ogni modifica a mano resta un override
+}
+// Rimuove l'override: il match torna gestito automaticamente dall'API ESPN.
+function _clearOverride(roundId, mid) {
+  if (_ris.bracket[roundId]) delete _ris.bracket[roundId][mid];
 }
 
 async function _salvaRisultatiTurno(roundId, btn) {
