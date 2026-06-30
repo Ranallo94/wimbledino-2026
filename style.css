@@ -2253,6 +2253,16 @@ select.field-input option { background: var(--bg-card2); }
 .round-matches .set-opt.selected { background: var(--oro); color: var(--text-dark); border-color: var(--oro); }
 .round-matches .set-opt:disabled { cursor: not-allowed; opacity: .7; }
 
+/* Override manuale (risultato inserito a mano, protetto dal sync API) */
+.round-matches .match-card.match-manuale { border-color: var(--oro); }
+.round-matches .ovr-tag {
+  grid-column: 2; justify-self: start; margin-top: 2px;
+  background: transparent; border: 1px solid var(--oro); color: var(--oro);
+  border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: background var(--transition), color var(--transition);
+}
+.round-matches .ovr-tag:hover { background: var(--oro); color: var(--text-dark); }
+
 /* Form bonus (pronostici + admin) */
 .bonus-form { display: grid; gap: 14px; }
 .bonus-field { display: flex; flex-direction: column; gap: 6px; }
