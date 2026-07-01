@@ -276,3 +276,47 @@ export function renderBonus(container, pron, db) {
   html += '</div>';
   container.innerHTML = html;
 }
+
+// ── Classifiche statistiche (ace / break / tie-break) ────────────────────
+// Categorie delle classifiche informative mostrate nel tab Risultati › Bonus.
+// I dati stanno in risultati/ufficiali.classifiche = { aces:[{pid,v}], breaks:[…], tiebreaks:[…] }.
+export const CLASSIFICHE = [
+  { id: 'aces',      emoji: '🎾', label: 'Ace' },
+  { id: 'breaks',    emoji: '💥', label: 'Break' },
+  { id: 'tiebreaks', emoji: '🔥', label: 'Tie-break' },
+];
+
+/**
+ * Render read-only delle tre classifiche (ace/break/tie-break).
+ * Ordina ogni classifica per valore decrescente. Se non c'è nessun dato,
+ * lascia il contenitore vuoto (non mostra nulla).
+ * @param {HTMLElement} container
+ * @param {Object} ris  documento risultati ufficiali ({ …, classifiche })
+ * @param {Object} db   DB evento (per i nomi giocatore)
+ */
+export function renderClassifiche(container, ris, db) {
+  if (!container) return;
+  const clf = (ris && ris.classifiche) || {};
+  const hasAny = CLASSIFICHE.some(c => Array.isArray(clf[c.id]) && clf[c.id].some(r => r && r.pid));
+  if (!hasAny) { container.innerHTML = ''; return; }
+
+  let html = '<div class="clf-wrap"><h4 class="clf-heading">📊 Classifiche</h4><div class="clf-grid">';
+  CLASSIFICHE.forEach(c => {
+    const rows = (clf[c.id] || [])
+      .filter(r => r && r.pid)
+      .slice()
+      .sort((a, b) => (b.v == null ? -Infinity : b.v) - (a.v == null ? -Infinity : a.v));
+    if (!rows.length) return;
+    html += `<div class="clf-card">
+      <h5 class="clf-title">${c.emoji} ${c.label}</h5>
+      <ol class="clf-list">` +
+      rows.map((r, i) => `<li class="clf-row${i < 3 ? ' clf-row--top clf-row--' + (i + 1) : ''}">
+        <span class="clf-pos">${i + 1}</span>
+        <span class="clf-name">${nomeGiocatore(db, r.pid)}</span>
+        <span class="clf-val">${r.v == null ? '' : r.v}</span>
+      </li>`).join('') +
+      `</ol></div>`;
+  });
+  html += '</div></div>';
+  container.innerHTML = html;
+}

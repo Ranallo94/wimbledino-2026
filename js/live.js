@@ -17,7 +17,7 @@ import { onRisultatiSnapshot, onSistemaSnapshot } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
   TURNI, matchId, getPron, getMatchPlayers,
-  renderBracketGrafico, renderBonus,
+  renderBracketGrafico, renderBonus, renderClassifiche,
 } from './bracket.js';
 import { rankBadge, infoBtn, openSchedaGiocatore } from './giocatore.js';
 import { formatDate } from './ui.js';
@@ -94,6 +94,7 @@ function _buildShell() {
     `<div id="ris-BONUS" class="tab-content">
        <div class="round-head"><h3 class="section-title">🏆 Bonus fine torneo</h3></div>
        <div id="ris-bonus-box"></div>
+       <div id="ris-classifiche-box" class="clf-outer"></div>
      </div>`;
 
   page.innerHTML = `
@@ -122,6 +123,7 @@ function _renderAttivo() {
   if (!_built || !_ris) return;
   if (_activeRound === 'BONUS') {
     renderBonus(document.getElementById('ris-bonus-box'), _ris, _db);
+    renderClassifiche(document.getElementById('ris-classifiche-box'), _ris, _db);
   } else if (_activeRound === 'BRACKET') {
     renderBracketGrafico(document.getElementById('ris-bracket-grafico'), _ris, _db);
   } else {

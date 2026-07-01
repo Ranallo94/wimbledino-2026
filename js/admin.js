@@ -20,7 +20,7 @@ import {
 } from './db.js';
 import { caricaEvento, nomeGiocatore } from './evento.js';
 import {
-  TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers,
+  TURNI, SET_OPTIONS, matchId, getPron, getMatchPlayers, CLASSIFICHE,
 } from './bracket.js';
 import { calcolaPunteggio } from './punteggi.js';
 import { showToast, openModal, closeModal, formatDate } from './ui.js';
@@ -46,6 +46,7 @@ export async function initAdmin() {
   _ris = (await getRisultati()) || {};
   if (!_ris.bracket) _ris.bracket = {};
   if (!_ris.bonus)   _ris.bonus = {};
+  if (!_ris.classifiche) _ris.classifiche = {};
 
   _buildShell();
   _built = true;
@@ -55,6 +56,7 @@ export async function initAdmin() {
   // lascia la lista partite vuota.
   TURNI.forEach(t => _renderRoundRisultati(t.id));
   _renderBonus();
+  _renderClassifiche();
 
   try { await _caricaConfigMontepremi(); } catch (e) { console.error('[admin] config montepremi', e); }
   try { await _caricaPartecipanti(); }     catch (e) { console.error('[admin] partecipanti', e); }
@@ -127,6 +129,18 @@ function _buildShell() {
         <button type="button" class="btn btn-primary" data-savris="BONUS">💾 Salva Bonus</button>
         <span class="elim-save-msg" id="rismsg-BONUS"></span>
       </div>
+
+      <div class="clf-admin-section">
+        <div class="info-banner info-banner--yellow">
+          <span>📊</span>
+          <span>Inserisci le <strong>classifiche</strong> di ace, break e tie-break. Scegli il giocatore dal menu e digita il valore; usa <strong>⬆⬇</strong> per riordinare e <strong>🗑</strong> per rimuovere. Agli utenti la classifica appare ordinata per valore decrescente. Queste classifiche sono informative e <strong>non incidono sul punteggio</strong>.</span>
+        </div>
+        <div id="admin-classifiche-box" class="clf-edit-wrap"></div>
+        <div class="elim-save-row">
+          <button type="button" class="btn btn-primary" data-savris="CLASSIFICHE">💾 Salva classifiche</button>
+          <span class="elim-save-msg" id="rismsg-CLASSIFICHE"></span>
+        </div>
+      </div>
     </div>
 
     <div id="tab-admin-partecipanti" class="tab-content">
@@ -162,6 +176,7 @@ function _buildShell() {
     btn.addEventListener('click', () => {
       const r = btn.dataset.savris;
       if (r === 'BONUS') _salvaBonus(btn);
+      else if (r === 'CLASSIFICHE') _salvaClassifiche(btn);
       else _salvaRisultatiTurno(r, btn);
     });
   });
@@ -488,6 +503,104 @@ function _renderBonus() {
       if (!_ris.bonus) _ris.bonus = {};
       _ris.bonus[s.dataset.bonus] = s.value || null;
     }));
+}
+
+// ── CLASSIFICHE (ace / break / tie-break) ─────────────
+/** Opzioni <option> dei 128 giocatori del tabellone, ordinate per nome. */
+function _giocatoreOptions(sel) {
+  const ids = Object.keys(_db.giocatori || {})
+    .sort((x, y) => nomeGiocatore(_db, x).localeCompare(nomeGiocatore(_db, y), 'it'));
+  return '<option value="">— seleziona —</option>' +
+    ids.map(pid => `<option value="${pid}"${sel === pid ? ' selected' : ''}>${nomeGiocatore(_db, pid)}</option>`).join('');
+}
+
+/** Garantisce l'esistenza della riga idx nella classifica cat e la restituisce. */
+function _clfEnsure(cat, idx) {
+  if (!_ris.classifiche) _ris.classifiche = {};
+  if (!Array.isArray(_ris.classifiche[cat])) _ris.classifiche[cat] = [];
+  if (!_ris.classifiche[cat][idx]) _ris.classifiche[cat][idx] = { pid: null, v: null };
+  return _ris.classifiche[cat][idx];
+}
+
+/** Editor delle tre classifiche (menu giocatore + valore, add/remove/riordina). */
+function _renderClassifiche() {
+  const box = document.getElementById('admin-classifiche-box');
+  if (!box) return;
+  if (!_ris.classifiche) _ris.classifiche = {};
+
+  box.innerHTML = CLASSIFICHE.map(c => {
+    const rows = _ris.classifiche[c.id] || [];
+    const rowsHtml = rows.map((r, i) => `
+      <div class="clf-edit-row">
+        <span class="clf-edit-pos">${i + 1}</span>
+        <select class="bonus-select clf-edit-player" data-cat="${c.id}" data-idx="${i}">${_giocatoreOptions(r.pid || '')}</select>
+        <input type="number" class="clf-edit-val" data-cat="${c.id}" data-idx="${i}" min="0" step="1" value="${r.v == null ? '' : r.v}" placeholder="valore" aria-label="Valore">
+        <button type="button" class="clf-edit-btn" data-clfup="${c.id}" data-idx="${i}" title="Sposta su" ${i === 0 ? 'disabled' : ''}>⬆</button>
+        <button type="button" class="clf-edit-btn" data-clfdown="${c.id}" data-idx="${i}" title="Sposta giù" ${i === rows.length - 1 ? 'disabled' : ''}>⬇</button>
+        <button type="button" class="clf-edit-btn clf-edit-del" data-clfdel="${c.id}" data-idx="${i}" title="Rimuovi">🗑</button>
+      </div>`).join('');
+    return `<div class="clf-edit-card">
+      <h4 class="clf-edit-title">${c.emoji} Classifica ${c.label}</h4>
+      <div class="clf-edit-rows">${rowsHtml || '<p class="text-muted clf-edit-empty">Nessuna riga. Aggiungi il primo giocatore.</p>'}</div>
+      <button type="button" class="btn btn-secondary clf-edit-add" data-clfadd="${c.id}">➕ Aggiungi giocatore</button>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.clf-edit-player').forEach(s =>
+    s.addEventListener('change', () => { _clfEnsure(s.dataset.cat, +s.dataset.idx).pid = s.value || null; }));
+  box.querySelectorAll('.clf-edit-val').forEach(inp =>
+    inp.addEventListener('input', () => {
+      const raw = inp.value.trim();
+      _clfEnsure(inp.dataset.cat, +inp.dataset.idx).v = raw === '' ? null : Math.max(0, parseInt(raw, 10) || 0);
+    }));
+  box.querySelectorAll('[data-clfadd]').forEach(b =>
+    b.addEventListener('click', () => {
+      const cat = b.dataset.clfadd;
+      if (!Array.isArray(_ris.classifiche[cat])) _ris.classifiche[cat] = [];
+      _ris.classifiche[cat].push({ pid: null, v: null });
+      _renderClassifiche();
+    }));
+  box.querySelectorAll('[data-clfdel]').forEach(b =>
+    b.addEventListener('click', () => {
+      const cat = b.dataset.clfdel, i = +b.dataset.idx;
+      (_ris.classifiche[cat] || []).splice(i, 1);
+      _renderClassifiche();
+    }));
+  box.querySelectorAll('[data-clfup]').forEach(b =>
+    b.addEventListener('click', () => {
+      const cat = b.dataset.clfup, i = +b.dataset.idx, a = _ris.classifiche[cat] || [];
+      if (i > 0) { [a[i - 1], a[i]] = [a[i], a[i - 1]]; _renderClassifiche(); }
+    }));
+  box.querySelectorAll('[data-clfdown]').forEach(b =>
+    b.addEventListener('click', () => {
+      const cat = b.dataset.clfdown, i = +b.dataset.idx, a = _ris.classifiche[cat] || [];
+      if (i < a.length - 1) { [a[i + 1], a[i]] = [a[i], a[i + 1]]; _renderClassifiche(); }
+    }));
+}
+
+async function _salvaClassifiche(btn) {
+  const msg = document.getElementById('rismsg-CLASSIFICHE');
+  btn.disabled = true; const old = btn.textContent; btn.textContent = '⏳ Salvataggio…';
+  try {
+    // Ripulisci: scarta righe senza giocatore e normalizza i valori.
+    const clean = {};
+    CLASSIFICHE.forEach(c => {
+      clean[c.id] = (_ris.classifiche[c.id] || [])
+        .filter(r => r && r.pid)
+        .map(r => ({ pid: r.pid, v: r.v == null ? null : Number(r.v) }));
+    });
+    _ris.classifiche = clean;
+    await setRisultati({ classifiche: clean });
+    if (msg) { msg.textContent = '✅ Salvato'; msg.className = 'elim-save-msg ok'; }
+    showToast('Classifiche salvate', 'success');
+    _renderClassifiche();
+  } catch (err) {
+    if (msg) { msg.textContent = '❌ Errore'; msg.className = 'elim-save-msg err'; }
+    showToast('Errore: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = old;
+    setTimeout(() => { if (msg) msg.textContent = ''; }, 4000);
+  }
 }
 
 async function _salvaBonus(btn) {
