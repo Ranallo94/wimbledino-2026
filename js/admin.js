@@ -133,7 +133,7 @@ function _buildShell() {
       <div class="clf-admin-section">
         <div class="info-banner info-banner--yellow">
           <span>📊</span>
-          <span>Inserisci le <strong>classifiche</strong> di ace, break e tie-break. Scegli il giocatore dal menu e digita il valore; usa <strong>⬆⬇</strong> per riordinare e <strong>🗑</strong> per rimuovere. Agli utenti la classifica appare ordinata per valore decrescente. Queste classifiche sono informative e <strong>non incidono sul punteggio</strong>.</span>
+          <span>Inserisci le <strong>classifiche</strong> di ace, break e tie-break. Scegli il giocatore dal menu e digita il valore: le righe si <strong>riordinano da sole</strong> per valore decrescente (valore più alto in cima). Usa <strong>🗑</strong> per rimuovere. Queste classifiche sono informative e <strong>non incidono sul punteggio</strong>.</span>
         </div>
         <div id="admin-classifiche-box" class="clf-edit-wrap"></div>
         <div class="elim-save-row">
@@ -522,11 +522,22 @@ function _clfEnsure(cat, idx) {
   return _ris.classifiche[cat][idx];
 }
 
-/** Editor delle tre classifiche (menu giocatore + valore, add/remove/riordina). */
+/** Editor delle tre classifiche (menu giocatore + valore; ordinamento automatico per valore desc). */
 function _renderClassifiche() {
   const box = document.getElementById('admin-classifiche-box');
   if (!box) return;
   if (!_ris.classifiche) _ris.classifiche = {};
+
+  // Ordina ogni classifica per valore decrescente (righe senza valore in fondo).
+  CLASSIFICHE.forEach(c => {
+    if (Array.isArray(_ris.classifiche[c.id])) {
+      _ris.classifiche[c.id].sort((a, b) => {
+        const av = a && a.v != null ? a.v : -Infinity;
+        const bv = b && b.v != null ? b.v : -Infinity;
+        return bv - av;
+      });
+    }
+  });
 
   box.innerHTML = CLASSIFICHE.map(c => {
     const rows = _ris.classifiche[c.id] || [];
@@ -535,8 +546,6 @@ function _renderClassifiche() {
         <span class="clf-edit-pos">${i + 1}</span>
         <select class="bonus-select clf-edit-player" data-cat="${c.id}" data-idx="${i}">${_giocatoreOptions(r.pid || '')}</select>
         <input type="number" class="clf-edit-val" data-cat="${c.id}" data-idx="${i}" min="0" step="1" value="${r.v == null ? '' : r.v}" placeholder="valore" aria-label="Valore">
-        <button type="button" class="clf-edit-btn" data-clfup="${c.id}" data-idx="${i}" title="Sposta su" ${i === 0 ? 'disabled' : ''}>⬆</button>
-        <button type="button" class="clf-edit-btn" data-clfdown="${c.id}" data-idx="${i}" title="Sposta giù" ${i === rows.length - 1 ? 'disabled' : ''}>⬇</button>
         <button type="button" class="clf-edit-btn clf-edit-del" data-clfdel="${c.id}" data-idx="${i}" title="Rimuovi">🗑</button>
       </div>`).join('');
     return `<div class="clf-edit-card">
@@ -548,11 +557,15 @@ function _renderClassifiche() {
 
   box.querySelectorAll('.clf-edit-player').forEach(s =>
     s.addEventListener('change', () => { _clfEnsure(s.dataset.cat, +s.dataset.idx).pid = s.value || null; }));
-  box.querySelectorAll('.clf-edit-val').forEach(inp =>
+  box.querySelectorAll('.clf-edit-val').forEach(inp => {
+    // Aggiorna il modello mentre si digita (senza riordinare, per non perdere il focus)…
     inp.addEventListener('input', () => {
       const raw = inp.value.trim();
       _clfEnsure(inp.dataset.cat, +inp.dataset.idx).v = raw === '' ? null : Math.max(0, parseInt(raw, 10) || 0);
-    }));
+    });
+    // …e riordina automaticamente quando il campo perde il focus (o si preme Invio).
+    inp.addEventListener('change', () => _renderClassifiche());
+  });
   box.querySelectorAll('[data-clfadd]').forEach(b =>
     b.addEventListener('click', () => {
       const cat = b.dataset.clfadd;
@@ -565,16 +578,6 @@ function _renderClassifiche() {
       const cat = b.dataset.clfdel, i = +b.dataset.idx;
       (_ris.classifiche[cat] || []).splice(i, 1);
       _renderClassifiche();
-    }));
-  box.querySelectorAll('[data-clfup]').forEach(b =>
-    b.addEventListener('click', () => {
-      const cat = b.dataset.clfup, i = +b.dataset.idx, a = _ris.classifiche[cat] || [];
-      if (i > 0) { [a[i - 1], a[i]] = [a[i], a[i - 1]]; _renderClassifiche(); }
-    }));
-  box.querySelectorAll('[data-clfdown]').forEach(b =>
-    b.addEventListener('click', () => {
-      const cat = b.dataset.clfdown, i = +b.dataset.idx, a = _ris.classifiche[cat] || [];
-      if (i < a.length - 1) { [a[i + 1], a[i]] = [a[i], a[i + 1]]; _renderClassifiche(); }
     }));
 }
 
