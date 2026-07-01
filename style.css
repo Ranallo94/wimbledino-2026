@@ -2718,3 +2718,76 @@ select.field-input option { background: var(--bg-card2); }
 .ris-pending {
   font-size: 12px; font-style: italic; color: var(--text-muted);
 }
+
+/* ── Classifiche statistiche (ace / break / tie-break) ───────────────── */
+/* Vista read-only (tab Risultati › Bonus) */
+.clf-outer { margin-top: 22px; }
+.clf-wrap { margin-top: 8px; }
+.clf-heading {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin: 0 0 12px; padding-top: 16px; border-top: 1px solid var(--border);
+}
+.clf-grid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.clf-card {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+}
+.clf-title {
+  margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+.clf-list { list-style: none; margin: 0; padding: 0; }
+.clf-row {
+  display: grid; grid-template-columns: 26px 1fr auto; align-items: center;
+  gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.clf-row:last-child { border-bottom: none; }
+.clf-pos {
+  width: 22px; height: 22px; display: inline-flex; align-items: center;
+  justify-content: center; font-weight: 700; font-size: 12px;
+  border-radius: 50%; background: var(--bg-card); color: var(--text-muted);
+}
+.clf-row--top .clf-pos { color: var(--text-dark); }
+.clf-row--1 .clf-pos { background: var(--oro); }
+.clf-row--2 .clf-pos { background: #c8d0d4; }
+.clf-row--3 .clf-pos { background: #d69a5c; }
+.clf-name { color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clf-val {
+  font-weight: 800; color: var(--oro); font-variant-numeric: tabular-nums;
+  min-width: 28px; text-align: right;
+}
+
+/* Editor admin (tab Bonus) */
+.clf-admin-section { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); }
+.clf-edit-wrap { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.clf-edit-card {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+}
+.clf-edit-title { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--text); }
+.clf-edit-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.clf-edit-empty { font-size: 13px; margin: 4px 0 8px; }
+.clf-edit-row { display: flex; align-items: center; gap: 6px; }
+.clf-edit-pos {
+  flex: 0 0 22px; height: 22px; display: inline-flex; align-items: center;
+  justify-content: center; font-weight: 700; font-size: 12px; color: var(--text-muted);
+}
+.clf-edit-player { flex: 1 1 auto; min-width: 0; }
+.clf-edit-val {
+  flex: 0 0 68px; width: 68px; padding: 8px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
+  font-size: 13px; text-align: center;
+}
+.clf-edit-val:focus { outline: none; border-color: var(--verde-light); }
+.clf-edit-btn {
+  flex: 0 0 auto; width: 30px; height: 34px; padding: 0; cursor: pointer;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text); font-size: 13px; line-height: 1;
+}
+.clf-edit-btn:hover:not(:disabled) { border-color: var(--verde-light); }
+.clf-edit-btn:disabled { opacity: .35; cursor: default; }
+.clf-edit-del:hover { border-color: #b3452f; }
+.clf-edit-add { margin-top: 2px; }
